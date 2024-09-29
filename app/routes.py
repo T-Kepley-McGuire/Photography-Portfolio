@@ -98,7 +98,7 @@ def get_pricing():
             'id': option.id,
             'name': option.name,
             'description': option.description,
-            'holdPrice': 0 if option.holdPrice is None else option.holdPrice,
+            'holdPrice': 0 if option.hold_price is None else option.hold_price,
             'price': option.price
         } for option in pricing_options
     ]
