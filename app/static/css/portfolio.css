@@ -1,0 +1,152 @@
+html {
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.title-card {
+  width: 100%;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+}
+
+.title-card > h1 {
+  font-family: "Cinzel", serif;
+  font-weight: 500;
+  font-size: xx-large;
+  width: 100%;
+  margin: auto auto;
+  text-align: center;
+}
+.swiper-container {
+  margin: 5px 0px;
+}
+.full-screen-section {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0; /* Default background color */
+  color: #333; /* Default text color */
+}
+/* Optional styling for navigation */
+/* nav ul {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  padding: 10px;
+}
+nav ul li a {
+  text-decoration: none;
+  color: #333;
+} */
+
+.swiper-container {
+  user-select: none;
+  width: 100%;
+  object-fit: contain;
+  position: relative;
+}
+
+.swiper-coverup {
+  position: absolute;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+
+  background-color: rgba(0,0,0,0.8);
+  pointer-events: none;
+  /* 
+    transition: background-color 0.3s ease;
+    &:hover {
+        background-color: rgba(0,0,0,0);
+    } */
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  overflow: hidden;
+  height: 100%;
+  width: auto;
+}
+.swiper-slide > img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+.swiper-slide > h3 {
+  font-family: "Cinzel", serif;
+  font-weight: 500;
+  font-size: xx-large;
+  color: white;
+  position: absolute;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  height: 80vh;
+  transform: translateY(-50%);
+  margin-top: 0px;
+  width: 60px;
+  opacity: 0;
+  pointer-events: none;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.swiper-button-next {
+  right: 0;
+  &:hover {
+    transform: translate(10px, -50%);
+  }
+}
+
+.swiper-button-prev {
+  left: 0;
+  &:hover {
+    transform: translate(-10px, -50%);
+  }
+}
+
+.hide-on-mobile {
+  display: none;
+}
+
+@media (orientation: landscape) {
+  .title-card {
+    scroll-snap-align: center;
+  }
+  .swiper-container {
+    scroll-snap-align: center;
+    max-height: 95vh;
+  }
+
+  main {
+    margin: 0 auto;
+    max-width: 120vh;
+    overflow-x: hidden;
+  }
+
+  .swiper-wrapper {
+    max-height: 100%;
+  }
+
+  .swiper-wrapper > img {
+    object-fit: fill;
+  }
+
+  .swiper-button-next,
+  .swiper-button-prev {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .hide-on-mobile {
+    display: block;
+  }
+}

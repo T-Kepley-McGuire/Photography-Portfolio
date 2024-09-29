@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    {% include 'include.html' %}
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/pricing.css')}}"
+    />
+    
+  </head>
+  <body>
+    {% include 'banner.html' %}
+    <div class="section-header">
+      <h2>Pricing Options</h2>
+      <h4>Select a package</h4>
+    </div>
+    <div id="pricing-options"></div>
+
+    <div class="section-header">
+      <h2>Timeslot</h2>
+    </div>
+
+    <div class="calendar-all-wrapper">
+      <div class="calendar-intersection-window"></div>
+      <div id="calendar-grid-header">
+        <div
+          id="calendar-year-name"
+          class="weekday"
+          style="grid-area: 1 / 1"
+        ></div>
+        <div class="weekday" style="grid-area: 1 / 2">Sun</div>
+        <div class="weekday" style="grid-area: 1 / 3">Mon</div>
+        <div class="weekday" style="grid-area: 1 / 4">Tues</div>
+        <div class="weekday" style="grid-area: 1 / 5">Wed</div>
+        <div class="weekday" style="grid-area: 1 / 6">Thur</div>
+        <div class="weekday" style="grid-area: 1 / 7">Fri</div>
+        <div class="weekday" style="grid-area: 1 / 8">Sat</div>
+      </div>
+      <div id="calendar-scroll-container" class="calendar-grid-container">
+        <div id="calendar-grid"></div>
+      </div>
+    </div>
+
+    <h4>Select an approximate time</h4>
+
+    <div id="timeslot-selector-wrapper" class="timeslot-selector-wrapper">
+      <div id="morning-timeslot" class="timeslot-card" data-selectable="">
+        Morning
+      </div>
+      <div id="afternoon-timeslot" class="timeslot-card" data-selectable="">
+        Afternoon
+      </div>
+      <div id="evening-timeslot" class="timeslot-card" data-selectable="">
+        Evening
+      </div>
+    </div>
+
+    <div class="message-wrapper">
+      <h3>Initial Thoughts?</h3>
+      <p>Don't worry we'll work out specifics soon</p>
+      <textarea id="message-input" maxlength="255"></textarea>
+    </div>
+
+    <!-- <div class="button-wrapper"><a href="{{url_for('main.payment')}}" id="confirm-booking">Confirm booking</a></div> -->
+    <div class="button-wrapper">
+      <button id="confirm-booking">Confirm booking</button>
+    </div>
+
+    {% include 'footer.html' %}
+    <script>
+      fetch("/api/pricing")
+        .then((response) => response.json())
+        .then((data) => {
+          const pricingContainer = document.getElementById("pricing-options");
+          const cards = data.map((option) => {
+            const optionDiv = document.createElement("div");
+            optionDiv.classList.add("pricing-card");
+            optionDiv.setAttribute("data-selectable", "");
+            optionDiv.setAttribute("data-pricing-id", option.id);
+            optionDiv.innerHTML = `
+                        <h2 class="card-title">${option.name}</h2>
+                        <p class="card-description">${option.description}</p>
+                        <p class="card-holdPrice">Hold price: $${option.holdPrice.toFixed(
+                          2
+                        )}</p>
+                        <p class="card-price">Price: $${option.price.toFixed(
+                          2
+                        )}</p>
+                    `;
+            pricingContainer.appendChild(optionDiv);
+            return optionDiv;
+          });
+          cards.forEach((card) => {
+            card.addEventListener("click", function () {
+              if (card.classList.contains("selected")) {
+                card.classList.remove("selected");
+              } else {
+                cards.forEach((c) => c.classList.remove("selected"));
+                card.classList.add("selected");
+              }
+            });
+          });
+        })
+        .catch((error) => console.error("Error fetching pricing data:", error));
+    </script>
+
+    <script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+  </body>
+</html>
