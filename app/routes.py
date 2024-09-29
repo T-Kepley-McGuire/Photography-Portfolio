@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, current_app
 from app.models import PricingOption, Date, AvailableTimeSlot, User, db
-from sqlalchemy import or_, and_
 import os
 import json
-import app
 
 main = Blueprint('main', __name__)
 
