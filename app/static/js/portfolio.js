@@ -1,10 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log([...Array(30).keys()].map((k) => k / 30.0));
-  // Function to calculate the opacity based on the closeness to the centerline
-  function calculateOpacity(x, m, b) {
-    // If within threshold, opacity should gradually reduce
-    return Math.min(Math.max(0, m * x + b), 0.8);
-  }
 
   // Create the observer
   const observer = new IntersectionObserver(
@@ -17,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     },
     {
-      threshold: [...Array(30).keys()].map((k) => k / 30.0), //[0.1, 0.5, 1], // Adjust this based on how you want to trigger the intersection
+      threshold: [...Array(30).keys()].map((k) => k / 30.0), 
     }
   );
 

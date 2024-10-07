@@ -34,17 +34,6 @@ def payment():
 
 @main.route('/portfolio')
 def portfolio():
-    # folder_path = os.path.join(
-    #     current_app.static_folder, 'images/photos/creme_de_la_creme')
-
-    # # List all files in the folder
-    # image_files = [f for f in os.listdir(
-    #     folder_path) if os.path.isfile(os.path.join(folder_path, f))]
-
-    # # Render the template, passing the list of image files
-    # return render_template('portfolio.html', image_files=image_files)
-
-    # return render_template('portfolio.html')
     photos_path = os.path.join(current_app.static_folder, 'images/photos')
 
     # Grab all subfolders within the photos directory
@@ -164,6 +153,8 @@ def update_timeslot_status():
 def get_available_dates():
     user = get_or_create_user()
 
+    update_expired_timeslots()
+
     available_timeslots = (
         db.session.query(AvailableTimeSlot)
         .join(Date, Date.id == AvailableTimeSlot.date_id)
@@ -191,7 +182,6 @@ def get_available_dates():
         for date_id, timeslots in date_timeslot_map.items()
     ]
 
-    update_expired_timeslots()
 
     return jsonify(date_timeslot_list)
 

@@ -1,0 +1,80 @@
+body {
+  position: relative;
+  /* position: absolute;
+    width: 100vw;
+    z-index: 2; */
+}
+
+.hero {
+  /* position: relative;
+  top: 0;
+  left: 0;
+  background-blend-mode: lighten;
+  background-size: cover;
+  background-position: center;
+  text-align: center; */
+  /* position: relative; */
+  height: 100vh;
+  width: 100vw;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: linear-gradient(
+    to bottom,
+    /* rgba(244, 244, 244, 1),
+    rgba(244, 244, 244, 0) 10%, */
+    rgba(244, 244, 244, 0) 80%,
+    rgba(244, 244, 244, 0.8)
+  );
+}
+
+.hero > *:not(#cover-photo) {
+  margin-top: 50px;
+}
+
+.hero h1 {
+  mix-blend-mode: multiply;
+  font-size: 37px;
+  /* padding-top: 75px;
+  margin-bottom: 20px;
+  margin-left: 10%; */
+  text-align: center;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hero p {
+  mix-blend-mode: multiply;
+  font-size: 24px;
+  /* margin-left: 10%; */
+  text-align: center;
+}
+
+#logo {
+  width: 40%;
+  max-width: 200px;
+  height: auto;
+  /* transform: translate(-50%, -50%); */
+  /* top: 20%;
+  left: 50%; */
+  z-index: 0;
+  opacity: 0.9;
+}
+
+#cover-photo {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  
+}
+
+@media (orientation: landscape) {
+  .hero > h1 {
+    font-size: 48px;
+  }
+}

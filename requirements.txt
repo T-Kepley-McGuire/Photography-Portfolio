@@ -3,3 +3,4 @@ flask_sqlalchemy
 flask_migrate
 datetime
 python-dotenv
+psycopg2-binary

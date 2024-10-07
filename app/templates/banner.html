@@ -1,20 +1,20 @@
 <header
   style="
+    display: flex;
+
     width: 100vw;
-    background: linear-gradient(
+    /* background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.5),
       rgba(0, 0, 0, 0.35),
       rgba(0, 0, 0, 0)
-    );
-    padding: 10px 0;
+    ); */
   "
 >
-  <nav>
-    <ul
-      class="nav-list"
-      style="list-style: none; display: flex; justify-content: space-evenly"
-    >
+  <p>Lizzie McGuire Photography</p>
+  <nav style="width: fit-content">
+    <div class="menu-icon"></div>
+    <ul class="nav-list" style="list-style: none">
       <li><a href="/">Home</a></li>
       <li><a href="{{ url_for('main.portfolio')}}">Portfolio</a></li>
       <li><a href="{{ url_for('main.about')}}">About</a></li>
@@ -22,3 +22,111 @@
     </ul>
   </nav>
 </header>
+<style>
+  header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: white;
+  }
+
+  header > * {
+    margin: 0 20px;
+  }
+
+  header > p {
+    padding: 10px 0;
+    color: black;
+    font-size: 18px;
+  }
+
+  .menu-icon {
+    position: absolute;
+    /* width: 40px; /* Adjust width as necessary */
+    height: 48px;
+    aspect-ratio: 1;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.6s ease; /* Smooth transition for unwind effect */
+  }
+
+  .menu-icon.opened:hover {
+    transform: rotate(360deg);
+  }
+
+  .menu-icon::before,
+  .menu-icon::after {
+    content: "";
+    position: absolute;
+    width: 80%;
+    height: 4px; /* Thickness of the lines */
+    background-color: gray;
+    border-radius: 2px;  
+    transition: transform 0.3s ease, top 0.3s ease, bottom 0.3s ease;
+  }
+
+  .menu-icon::before {
+    top: 25%; /* Adjust to position the first line */
+  }
+
+  .menu-icon::after {
+    bottom: 25%; /* Adjust to position the second line */
+  }
+
+  .menu-icon.opened::before {
+    transform: rotate(45deg);
+    top: 45%;
+}
+
+.menu-icon.opened::after {
+    transform: rotate(-45deg);
+    bottom: 45%;
+}
+/* 
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(180deg);
+    }
+  }
+
+  .menu-icon:hover {
+    animation: spin 0.6s forwards; 
+  }
+
+  .menu-icon:hover::before,
+  .menu-icon:hover::after {
+    animation: none; 
+  } */
+
+  .nav-list {
+    display: none;
+  }
+
+  .nav-list > li > a {
+    padding: 10px 10px;
+    text-decoration: none;
+    color: black;
+    font-size: 18px;
+    display: block;
+  }
+
+  .nav-list > li > a:hover {
+    color: #ddd;
+  }
+  @media (orientation: landscape) {
+    .nav-list {
+      display: flex;
+    }
+
+    .menu-icon {
+      display: none;
+    }
+  }
+</style>
