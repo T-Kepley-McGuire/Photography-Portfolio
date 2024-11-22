@@ -1,20 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    {% include 'include.html' %}    
-</head>
-<body>
+  <head>
+    {% include 'include.html' %}
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/about.css') }}"
+    />
+  </head>
+  <body>
     {% include 'banner.html' %}
-    
+
     <main>
-        <section class="about">
-            <h1>About Me</h1>
-            <p>Learn more about my journey as a photographer.</p>
-            <!-- You can add a bio, background information, and a photo here -->
-        </section>
+      <section class="about">
+        <h3>Hi. Welcome.</h3>
+        <p>
+          I've always seen beauty everywhere. Capturing that beauty is my
+          privilege and joy. My sense of awe is at the center of all my
+          photography and I want the world to share my awe and see what I see.
+          There's beauty in everything: mundane or profound, simple or complex,
+          large and small.
+        </p>
+        <p>
+          I began my photography when I was 14. Here's one of the first photos I
+          ever took
+        </p>
+        <!-- You can add a bio, background information, and a photo here -->
+      </section>
     </main>
 
-    
     {% include 'footer.html' %}
-</body>
+  </body>
 </html>

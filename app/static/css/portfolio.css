@@ -1,12 +1,12 @@
 html {
   scroll-behavior: smooth;
-  overflow-y: scroll;
   overflow-x: hidden;
 }
 
 .title-card {
+  position: relative;
   width: 100%;
-  height: 80vh;
+  height: 95vh;
   display: flex;
   justify-content: center;
 }
@@ -45,6 +45,7 @@ nav ul li a {
 .swiper-container {
   user-select: none;
   width: 100%;
+  height: 80vh;
   object-fit: contain;
   position: relative;
 }
@@ -123,13 +124,11 @@ nav ul li a {
   }
   .swiper-container {
     scroll-snap-align: center;
-    max-height: 95vh;
+    max-height: 80vh;
   }
 
   main {
     margin: 0 auto;
-    max-width: 120vh;
-    overflow-x: hidden;
   }
 
   .swiper-wrapper {
@@ -149,4 +148,64 @@ nav ul li a {
   .hide-on-mobile {
     display: block;
   }
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust columns based on screen width */
+  grid-gap: 10px;
+}
+
+.grid-column {
+  display: none;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.grid-column.shown {
+  display: flex;
+}
+
+.photothumb {
+  width: 100%;
+  object-fit: cover;
+  margin-bottom: 10px; /* Spacing between images */
+  min-height: 300px;
+  
+  /* Start with hidden opacity */
+  opacity: 0;
+  transition: opacity 0.5s ease-in; /* 0.5s transition for opacity */
+}
+
+
+.bottom-observer {
+  width: 100%;
+  height: 10px;
+}
+
+/* .down-arrow {
+  width: 0;
+  height: 0;
+  border-radius: 10px;
+  border-left: 90px solid transparent; 
+  border-right: 90px solid transparent;
+  border-top: 90px solid #333;
+  
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%); 
+} */
+.down-arrow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 1s ease-in;
+}
+
+.down-arrow .material-symbols-rounded {
+  font-size: 96px; /* Adjust size as needed */
+  color: #333; /* Adjust color as needed */
 }

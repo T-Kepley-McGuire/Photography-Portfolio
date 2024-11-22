@@ -34,40 +34,56 @@ def payment():
 
 @main.route('/portfolio')
 def portfolio():
-    photos_path = os.path.join(current_app.static_folder, 'images/photos')
+    # photos_path = os.path.join(current_app.static_folder, 'images/photos')
 
-    # Grab all subfolders within the photos directory
-    subfolders = [f for f in os.listdir(photos_path) if os.path.isdir(os.path.join(photos_path, f))]
+    # # Grab all subfolders within the photos directory
+    # subfolders = [f for f in os.listdir(photos_path) if os.path.isdir(os.path.join(photos_path, f))]
 
-    # Initialize a dictionary to store image files per subfolder
-    gallery_data = {}
+    # # Initialize a dictionary to store image files per subfolder
+    # gallery_data = {}
 
-    for subfolder in subfolders:
-        # Path to the current subfolder
-        folder_path = os.path.join(current_app.static_folder, f'images/photos/{subfolder}')
+    # for subfolder in subfolders:
+    #     # Path to the current subfolder
+    #     folder_path = os.path.join(current_app.static_folder, f'images/photos/{subfolder}')
 
-        # List all files in the current subfolder and filter out the metadata.json file
-        image_files = [f for f in os.listdir(folder_path) 
-                       if os.path.isfile(os.path.join(folder_path, f)) and f != 'metadata.json']
+    #     # List all files in the current subfolder and filter out the metadata.json file
+    #     image_files = [f for f in os.listdir(folder_path) 
+    #                    if os.path.isfile(os.path.join(folder_path, f)) and f != 'metadata.json']
 
-        # Load the metadata file if it exists
-        metadata_path = os.path.join(folder_path, 'metadata.json')
-        aspect_ratio = 1.0  # Default aspect ratio
+    #     # Load the metadata file if it exists
+    #     metadata_path = os.path.join(folder_path, 'metadata.json')
+    #     aspect_ratio = 1.0  # Default aspect ratio
 
-        if os.path.exists(metadata_path):
-            with open(metadata_path, 'r') as metadata_file:
-                metadata = json.load(metadata_file)
-                aspect_ratio = metadata.get('aspect_ratio', 1.0)  # Use default 1.0 if not specified
+    #     if os.path.exists(metadata_path):
+    #         with open(metadata_path, 'r') as metadata_file:
+    #             metadata = json.load(metadata_file)
+    #             aspect_ratio = metadata.get('aspect_ratio', 1.0)  # Use default 1.0 if not specified
 
-        # Add the subfolder, its images, and aspect ratio to the dictionary
-        gallery_data[subfolder] = {
-            'images': image_files,
-            'aspect_ratio': aspect_ratio
-        }
+    #     # Add the subfolder, its images, and aspect ratio to the dictionary
+    #     gallery_data[subfolder] = {
+    #         'images': image_files,
+    #         'aspect_ratio': aspect_ratio
+    #     }
 
     # Render the template and pass the gallery_data
-    return render_template('portfolio.html', gallery_data=gallery_data)
+    return render_template('portfolio.html') #, gallery_data=gallery_data)
 
+@main.route('/portfolio/images')
+def images():
+    # Define the path to the portfolio folder
+    portfolio_folder = os.path.join(current_app.static_folder, 'images', 'portfolio')
+    
+    # List all image files in the portfolio folder
+    image_files = [f for f in os.listdir(portfolio_folder) if os.path.isfile(os.path.join(portfolio_folder, f))]
+    
+    # Create a list of URLs for the images in the portfolio folder
+    image_list = [
+        url_for('static', filename=f'images/portfolio/{image}')
+        for image in image_files
+    ]
+
+    # Return the list of image URLs as a JSON array
+    return jsonify(image_list)
 
 
 @main.route('/about')

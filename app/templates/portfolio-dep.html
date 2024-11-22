@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% include 'include.html' %}
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/swiper/swiper-bundle.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/portfolio.css') }}"
+    />
+  </head>
+  <body>
+    {% include 'banner.html' %}
+    <main>
+      <section class="title-card">
+        <h1>Here's some of my work</h1>
+      </section>
+
+      {% for folder, data in gallery_data.items() %}
+      <section class="swiper-container">
+        <div class="swiper-coverup" id="{{ loop.index }}"></div>
+
+        <div
+          class="swiper-wrapper"
+          style="aspect-ratio: {{data.aspect_ratio}};"
+        >
+          {% for image in data.images %}
+          <div class="swiper-slide">
+            {% if loop.index == 1 %}
+            <h3>{{ folder }}</h3>
+            {% endif %}
+            <img
+              src="{{ url_for('static', filename='images/photos/' + folder + '/' + image) }}"
+              alt="{{ folder }} - Image {{ loop.index }}"
+            />
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </section>
+      {% endfor %}
+    </main>
+
+    {% include 'footer.html' %}
+  </body>
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+  <script src="{{ url_for('static', filename='js/portfolio.js')}}"></script>
+  <script>
+    var swiper = new Swiper(".swiper-container", {
+      slidesPerView: "auto",
+      centeredSlides: true,
+      initialSlide: 0,
+      spaceBetween: 30,
+      loop: true,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    });
+  </script>
+</html>

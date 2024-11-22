@@ -1,8 +1,10 @@
 <header
   style="
     display: flex;
-
-    width: 100vw;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    width: 100%;
     /* background: linear-gradient(
       to bottom,
       rgba(0, 0, 0, 0.5),
@@ -11,10 +13,12 @@
     ); */
   "
 >
-  <p>Lizzie McGuire Photography</p>
+  <a href="/" class="company-name" style="text-decoration: none"
+    >Lizzie McGuire Photography</a
+  >
   <nav style="width: fit-content">
-    <div class="menu-icon"></div>
-    <ul class="nav-list" style="list-style: none">
+    <div id="menu-icon" class="menu-icon"></div>
+    <ul id="nav-list" class="nav-list" style="list-style: none">
       <li><a href="/">Home</a></li>
       <li><a href="{{ url_for('main.portfolio')}}">Portfolio</a></li>
       <li><a href="{{ url_for('main.about')}}">About</a></li>
@@ -22,6 +26,16 @@
     </ul>
   </nav>
 </header>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const menuIcon = document.getElementById("menu-icon");
+    const menu = document.getElementById("nav-list");
+    menuIcon.addEventListener("click", () => {
+      menuIcon.classList.toggle("opened");
+      menu.classList.toggle("opened");
+    });
+  });
+</script>
 <style>
   header {
     flex-direction: row;
@@ -31,10 +45,10 @@
   }
 
   header > * {
-    margin: 0 20px;
+    margin: 0px;
   }
 
-  header > p {
+  .company-name {
     padding: 10px 0;
     color: black;
     font-size: 18px;
@@ -54,7 +68,7 @@
     transition: transform 0.6s ease; /* Smooth transition for unwind effect */
   }
 
-  .menu-icon.opened:hover {
+  .menu-icon.opened {
     transform: rotate(360deg);
   }
 
@@ -65,7 +79,7 @@
     width: 80%;
     height: 4px; /* Thickness of the lines */
     background-color: gray;
-    border-radius: 2px;  
+    border-radius: 2px;
     transition: transform 0.3s ease, top 0.3s ease, bottom 0.3s ease;
   }
 
@@ -80,41 +94,46 @@
   .menu-icon.opened::before {
     transform: rotate(45deg);
     top: 45%;
-}
+  }
 
-.menu-icon.opened::after {
+  .menu-icon.opened::after {
     transform: rotate(-45deg);
     bottom: 45%;
-}
-/* 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(180deg);
-    }
   }
 
-  .menu-icon:hover {
-    animation: spin 0.6s forwards; 
-  }
-
-  .menu-icon:hover::before,
-  .menu-icon:hover::after {
-    animation: none; 
-  } */
-
-  .nav-list {
-    display: none;
-  }
-
-  .nav-list > li > a {
+  .nav-list > li > a,
+  .company-name {
+    color: black;
     padding: 10px 10px;
     text-decoration: none;
-    color: black;
     font-size: 18px;
     display: block;
+  }
+
+  .nav-list {
+    overflow: hidden;
+    transition: height 0.6s ease;
+  }
+
+  @media (orientation: portrait) {
+    .nav-list > li > a {
+      color: transparent;
+    }
+    .nav-list {
+      height: 0px;
+    }
+
+    .nav-list.opened {
+      display: block;
+      height: calc(48.8px * 4);
+      width: 100vw;
+      left: 0;
+    }
+  }
+
+  nav:has(.nav-list.opened) > .nav-list > li > a {
+    flex-direction: column;
+    color: black;
   }
 
   .nav-list > li > a:hover {
@@ -123,6 +142,7 @@
   @media (orientation: landscape) {
     .nav-list {
       display: flex;
+      flex-direction: row;
     }
 
     .menu-icon {

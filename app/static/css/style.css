@@ -10,14 +10,21 @@ html,body {
 
 /* Body styling */
 body {
-  scrollbar-gutter: stable;
+  /* scrollbar-gutter: stable; */
   font-family: "Cinzel", serif;
   font-weight: 500;
   line-height: 1.6;
   background-color: #f4f4f4;
   color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+main {
+  flex-grow: 2;
+  width: 100vw;
+}
 
 body,
 h1,
@@ -28,11 +35,6 @@ ul {
   padding: 0;
 }
 
-
-
-/* Hero section styling */
-
-/* Intro section styling */
 .intro {
   text-align: center;
   padding: 40px 20px;
@@ -48,14 +50,6 @@ ul {
   color: #666;
 }
 
-/* Footer styling */
-footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 20px 0;
-  margin-top: 20px;
-}
 
 /* Modal styling */
 .modal {
