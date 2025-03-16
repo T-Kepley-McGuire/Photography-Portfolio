@@ -12,9 +12,9 @@ db.create_all()
 
 # Sample mock data for pricing options
 pricing_options = [
-    PricingOption(name="Basic Package", description="1-hour photo shoot, 20 edited photos", hold_price=10.00, price=100.00),
-    PricingOption(name="Standard Package", description="2-hour photo shoot, 30 edited photos", hold_price=20.00, price=180.00),
-    PricingOption(name="Premium Package", description="4-hour photo shoot, 45 edited photos", hold_price=30.00, price=320.00),
+    PricingOption(name="Basic Package", description="20-min photo shoot, 20 edited photos", hold_price=0, price=100.00),
+    PricingOption(name="Standard Package", description="40-min photo shoot, 30 edited photos", hold_price=20.00, price=180.00),
+    PricingOption(name="Premium Package", description="1-hour photo shoot, 45 edited photos", hold_price=30.00, price=320.00),
 ]
 
 # Sample mock data for dates and available time slots

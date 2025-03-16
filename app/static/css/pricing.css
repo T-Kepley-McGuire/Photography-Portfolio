@@ -271,7 +271,6 @@ h2 {
 }
 /* Modal Styles */
 .modal {
-  display: none;
   position: fixed;
   z-index: 1;
   left: 0;
@@ -325,11 +324,6 @@ h2 {
   margin: 0 auto;
   width: calc(8 * var(--day-width) + 7 * var(--day-margin));
 }
-
-/* .calendar-intersection-window {
-  width: calc(8 * var(--day-width) + 7 * var(--day-margin));
-  height: 
-} */
 
 .calendar-grid-container {
   height: calc(6 * var(--day-width) + 6 * var(--day-margin));
@@ -499,4 +493,115 @@ button {
 button:active {
   border: 3px solid #2b8b53;
   transition: border 0.5s ease;
+}
+
+
+#confirmation-box {
+  position: absolute; 
+  left: 0; 
+  right: 0; 
+  margin-inline: auto; 
+  top: 20%;
+  width: 30%;
+  min-width: 300px;
+  height: fit-content;
+  padding: 10px 0;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  box-shadow: 0px 0px 20px gray;
+  z-index: 2;
+  padding: 20px;
+}
+
+.confirmation-box-wrapper {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.close-button {
+  position: relative;
+  margin: 0 10px 0 auto;
+  width: 20px;
+  height: 20px;
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+
+    width: 100%;
+    height: 2px; 
+    background-color: black;
+    border-radius: 2px;
+  }
+
+  &::before {
+    rotate: -45deg;
+  }
+  &::after {
+    rotate: 45deg;
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+input {
+  margin-bottom: 10px;
+}
+
+input:invalid {
+  background-color: rgb(230, 174, 174);
+}
+
+#error-message {
+  color: darkred;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+
+.hidden {
+  display: none;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: row;
+  & > * {
+    width: 40%;
+  }
+  & > label {
+    text-align: right;
+  }
+  & > input {
+    margin-left: 10px;
+  }
 }

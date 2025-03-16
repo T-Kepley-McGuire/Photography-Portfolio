@@ -19,21 +19,24 @@ class Date(db.Model):
     date = db.Column(db.Date, nullable=False, unique=True)  # Ensure uniqueness for each date
 
     def __repr__(self):
-        return f'<Date {self.date}>'
+        if not self.date:
+            return 'Invalid Date'
+        return self.date.strftime('%b. %d, %Y')  # Example: Dec. 10, 2020
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ip = db.Column(db.String(30), nullable=True)
+    email = db.Column(db.String(255), nullable=False, unique=True)  # Email is required and unique
     held_timeslot = db.Column(db.Integer, db.ForeignKey('available_time_slot.id'), nullable=True)
-    hold_until = db.Column(db.DateTime, nullable=True)  # Optional expiration for held timeslots
+    hold_until = db.Column(db.DateTime, nullable=True)
     held_price = db.Column(db.Integer, db.ForeignKey('pricing_option.id'), nullable=True)
-    held_message = db.Column(db.String(255), nullable=True)
 
     held_timeslot_rel = db.relationship('AvailableTimeSlot', backref=db.backref('users', lazy=True))
     held_price_rel = db.relationship('PricingOption', backref=db.backref('users', lazy=True))
 
-    def __init__(self, ip):
-        self.ip = ip
+    def __repr__(self):
+        return f'<User {self.email}>'
+
 
 
 
@@ -47,3 +50,10 @@ class AvailableTimeSlot(db.Model):
 
     def to_dict(self):
         return self.id
+    
+    def __repr__(self):
+        # Safely fetch the date if it's loaded, otherwise fetch from the db
+        timeslot_date = Date.query.get(self.date_id).date
+
+        return f'the {self.timeslot} of {timeslot_date}'
+
