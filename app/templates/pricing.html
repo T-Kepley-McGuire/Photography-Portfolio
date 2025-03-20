@@ -85,122 +85,25 @@
           <!-- Error message placeholder -->
           <p id="error-message" class="hidden"></p>
           <!-- Confirm Booking button triggers the setupConfirmButton functionality -->
-          <div class="button-wrapper" style="margin-bottom: 0;"><button style="width: 30%; min-width: 170px;" type="button" id="confirm-booking">Confirm Booking</button></div>
+          <div class="button-wrapper" style="margin-bottom: 0">
+            <button
+              style="width: 30%; min-width: 170px"
+              type="button"
+              id="confirm-booking"
+            >
+              Confirm Booking
+            </button>
+          </div>
         </form>
       </div>
     </div>
-
-    <!-- <div class="message-wrapper">
-      <h3>Email for confirmation</h3>
-      <input type="email" id="email-input" />
-      <p style="max-width: 90%; text-align: center">
-        Don't worry we'll work out specifics soon
-      </p>
-    </div>
-
-    <div class="button-wrapper">
-      <p id="error-message" class="hidden"></p>
-      <button id="confirm-booking">Confirm booking</button>
-    </div>
-
-    <div id="confirmation-box-wrapper" class="confirmation-box-wrapper hidden">
-      <div id="confirmation-box" class="modal">
-        <div id="close-button"></div>
-        <h3>Thanks for booking with us!</h3>
-        <p>An email has been sent</p>
+    <div id="thanks-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Booking confirmed</h3>
+        <p style="text-align: center;">You will receive and email confirmation shortly</p>
       </div>
-    </div> -->
-
+    </div>
     {% include 'footer.html' %}
-    <!-- <script>
-      document.addEventListener("DOMContentLoaded", () => {
-  // Elements for modal handling
-  const continueBtn = document.getElementById("continue-booking");
-  const modal = document.getElementById("confirmation-modal");
-  const modalClose = document.getElementById("modal-close");
-
-  // Show the modal when the Continue Booking button is clicked
-  continueBtn.addEventListener("click", () => {
-    modal.classList.remove("hidden");
-  });
-
-  // Hide the modal when the close button is clicked
-  modalClose.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-
-  // Set up Confirm Booking button functionality
-  const confirmBtn = document.getElementById("confirm-booking");
-  confirmBtn.addEventListener("click", async () => {
-    // Collect the input fields from the modal form
-    const firstName = document.getElementById("first-name").value.trim();
-    const lastName  = document.getElementById("last-name").value.trim();
-    const email     = document.getElementById("email").value.trim();
-    const phone     = document.getElementById("phone").value.trim();
-
-    // (You can extend your validation here if needed)
-    if (!firstName || !lastName || !email) {
-      document.getElementById("error-message").innerText = "Please fill in all required fields.";
-      document.getElementById("error-message").classList.remove("hidden");
-      return;
-    } else {
-      document.getElementById("error-message").classList.add("hidden");
-    }
-
-    // Call your existing functionality from setupConfirmButton here.
-    // For instance, if you already have a function like:
-    // async function setupConfirmButton(calendarAndDayDivs, timeslots) { ... }
-    // You can call it here after collecting the additional form data.
-    //
-    // NOTE: You may need to update the code inside setupConfirmButton to also
-    // retrieve firstName, lastName, and phone if they are required for your backend.
-    //
-    // For now, assuming that the rest of your booking functionality remains the same,
-    // and that the email input is used for booking, we show the modal confirmation:
-    
-    // Example: prepare data for booking request (adjust this to match your logic)
-    let data = {
-      // ... include timeslot_id, status, pricing_id, etc.
-      email: email,
-      first_name: firstName,
-      last_name: lastName,
-      phone: phone // phone is optional
-    };
-
-    console.log("Booking data prepared:", data);
-    
-    // Here, you would perform the fetch request to your backend API as in your original code.
-    // For demonstration, we just log the data and then hide the modal:
-    try {
-      // Assume your booking confirmation code goes here:
-      // let response = await fetch('/api/update_timeslot_status', { ... });
-      // if (!response.ok) throw new Error("Booking failed");
-      // Otherwise, process the response, update UI, etc.
-      console.log("Booking confirmed (simulate API call).");
-      // After booking is confirmed, hide the modal:
-      modal.classList.add("hidden");
-    } catch (error) {
-      console.error("Failed to confirm booking:", error);
-    }
-  });
-});
-
-    </script> -->
-    <!-- <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        // Select DOM elements
-        const confirmationBoxWrapper = document.getElementById(
-          "confirmation-box-wrapper"
-        );
-        const closeButton = document.getElementById("close-button");
-        confirmationBoxWrapper.addEventListener("click", () =>
-          confirmationBoxWrapper.classList.toggle("hidden")
-        );
-        closeButton.addEventListener("click", () =>
-          confirmationBoxWrapper.classList.toggle("hidden")
-        );
-      });
-    </script> -->
     <script>
       fetch("/api/pricing")
         .then((response) => response.json())

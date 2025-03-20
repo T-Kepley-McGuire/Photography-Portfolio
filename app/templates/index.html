@@ -13,9 +13,9 @@
             <p>Capturing moments, one shot at a time.</p>
             <img id="cover-photo" src="{{url_for('static', filename='images/cover-photo.jpg')}}" alt="cover photo">
         </section>
-        <section class="intro">
-            <h2>My Work</h2>
-            <p>Explore my portfolio to see a range of my work</p>
+        
+        <section>
+            {% include 'portfolioForHome.html' %}
         </section>
     </main>
     {% include 'footer.html' %}

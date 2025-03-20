@@ -20,8 +20,7 @@
     <div id="menu-icon" class="menu-icon"></div>
     <ul id="nav-list" class="nav-list" style="list-style: none">
       <li><a href="/">Home</a></li>
-      <li><a href="{{ url_for('main.portfolio')}}">Portfolio</a></li>
-      <li><a href="{{ url_for('main.about')}}">About</a></li>
+          
       <li><a href="{{ url_for('main.pricing')}}">Booking</a></li>
     </ul>
   </nav>
@@ -125,7 +124,7 @@
 
     .nav-list.opened {
       display: block;
-      height: calc(48.8px * 4);
+      height: calc(48.8px * 2);
       width: 100vw;
       left: 0;
     }

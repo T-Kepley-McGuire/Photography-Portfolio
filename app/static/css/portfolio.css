@@ -42,7 +42,7 @@ nav ul li a {
   color: #333;
 } */
 
-.swiper-container {
+/* .swiper-container {
   user-select: none;
   width: 100%;
   height: 80vh;
@@ -56,13 +56,8 @@ nav ul li a {
   inset: 0;
   z-index: 2;
 
-  background-color: rgba(0,0,0,0.8);
+  background-color: rgba(0, 0, 0, 0.8);
   pointer-events: none;
-  /* 
-    transition: background-color 0.3s ease;
-    &:hover {
-        background-color: rgba(0,0,0,0);
-    } */
 }
 
 .swiper-slide {
@@ -112,7 +107,7 @@ nav ul li a {
   &:hover {
     transform: translate(-10px, -50%);
   }
-}
+} */
 
 .hide-on-mobile {
   display: none;
@@ -153,7 +148,10 @@ nav ul li a {
 .grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Adjust columns based on screen width */
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(400px, 1fr)
+  ); /* Adjust columns based on screen width */
   grid-gap: 10px;
 }
 
@@ -172,31 +170,18 @@ nav ul li a {
   object-fit: cover;
   margin-bottom: 10px; /* Spacing between images */
   min-height: 300px;
-  
+
+  cursor: pointer;
   /* Start with hidden opacity */
   opacity: 0;
   transition: opacity 0.5s ease-in; /* 0.5s transition for opacity */
 }
-
 
 .bottom-observer {
   width: 100%;
   height: 10px;
 }
 
-/* .down-arrow {
-  width: 0;
-  height: 0;
-  border-radius: 10px;
-  border-left: 90px solid transparent; 
-  border-right: 90px solid transparent;
-  border-top: 90px solid #333;
-  
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%); 
-} */
 .down-arrow {
   position: absolute;
   bottom: 0;
@@ -208,4 +193,82 @@ nav ul li a {
 .down-arrow .material-symbols-rounded {
   font-size: 96px; /* Adjust size as needed */
   color: #333; /* Adjust color as needed */
+  transition: opacity 0.3s ease;
+}
+
+#photos-modal {
+  display: flex;
+  justify-content: center; /* centers horizontally */
+  align-items: center; /* centers vertically */
+}
+
+.hidden {
+  display: none !important;
+}
+
+#photos-modal > .modal-content {
+  position: absolute; /* Keeps absolutely positioned icons safe */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(20px);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: fit-content;
+  height: fit-content;
+  padding: 0;
+  overflow: hidden; /* Prevents content from overflowing */
+  z-index: 2;
+  border: none;
+}
+
+#background-clicker {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.01);
+}
+.modal-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  object-fit: contain; /* Ensures the aspect ratio is preserved */
+  display: block;
+}
+
+#right-arrow,
+#left-arrow {
+  position: fixed;
+  z-index: 4;
+  height: fit-content;
+  font-size: 96px;
+  color: #e4e4e4;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease;
+  text-shadow: 0 0 5px gray;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  &:hover {
+    cursor: pointer;
+  }
+}
+#left-arrow {
+  left: 5%;
+  &:hover {
+    transform: translate(-20px, -50%);
+  }
+}
+#right-arrow {
+  right: 5%;
+  &:hover {
+    transform: translate(20px, -50%);
+  }
 }

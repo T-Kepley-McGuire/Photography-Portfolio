@@ -331,150 +331,13 @@ function scrollToToday() {
   }
 }
 
-// const setupConfirmButton = (calendarAndDayDivs, timeslots) => {
-//   const button = document.getElementById("confirm-booking");
-
-//   if (button) {
-//     button.addEventListener("click", async () => {
-//       let selectedDay = null;
-//       // Find the selected day object (store the whole object instead of just the element)
-//       for (const cadd of calendarAndDayDivs) {
-//         const availableDay = document.getElementById(cadd.id);
-//         if (availableDay.classList.contains("selected")) {
-//           selectedDay = cadd;
-//           break; // Stop after finding the selected day
-//         }
-//       }
-
-//       // Find the selected timeslot
-//       let selectedTimeslot = null;
-//       if (timeslots.morning.classList.contains("selected")) {
-//         selectedTimeslot = "morning";
-//       } else if (timeslots.afternoon.classList.contains("selected")) {
-//         selectedTimeslot = "afternoon";
-//       } else if (timeslots.evening.classList.contains("selected")) {
-//         selectedTimeslot = "evening";
-//       }
-
-//       let selectedPricing = null;
-//       pricingCards = document.querySelectorAll(".pricing-card");
-//       for (const pc of pricingCards) {
-//         if (pc.classList.contains("selected")) {
-//           selectedPricing = new Number(pc.getAttribute("data-pricing-id"));
-//           break;
-//         }
-//       }
-
-//       const inputEmailDiv = document.getElementById("email-input");
-//       const inputEmail = inputEmailDiv.value;
-
-//       if (
-//         selectedDay &&
-//         selectedTimeslot &&
-//         selectedPricing &&
-//         inputEmailDiv.checkValidity() &&
-//         inputEmail.length > 0
-//       ) {
-//         // Check if the selected timeslot is available for the selected day
-//         const timeslotData = selectedDay.timeslots[selectedTimeslot];
-//         console.log(selectedDay.timeslots);
-//         if (!timeslotData) {
-//           // Timeslot is not available or missing ID, log a message and stop further execution
-//           console.log(
-//             `The selected timeslot (${selectedTimeslot}) is not available for the selected day.`
-//           );
-//           return; // Exit the function to prevent the request
-//         }
-
-//         // Prepare data for the request using the timeslot ID
-//         const data = {
-//           timeslot_id: timeslotData, // Use the ID associated with the timeslot
-//           status: "held",
-//           pricing_id: selectedPricing,
-//           email: inputEmail,
-//         };
-
-//         console.log(`Committing timeslot to hold: ${JSON.stringify(data)}`);
-
-//         try {
-//           // Make the PUT request to the backend API to update the status
-//           const response = await fetch(`/api/update_timeslot_status`, {
-//             method: "PUT",
-//             headers: {
-//               "Content-Type": "application/json",
-//             },
-//             body: JSON.stringify(data), // Send the timeslot ID and new status
-//           });
-
-//           if (!response.ok) {
-//             throw new Error(`Error: ${response.statusText}`);
-//           }
-
-//           const result = await response.json();
-//           console.log("Booking confirmed: ", result);
-
-//           const datesList = loadCalendar();
-
-//           const calendarAndDayDivs = await loadAvailability(datesList);
-
-//           const timeslots = {
-//             morning: document.getElementById("morning-timeslot"),
-//             afternoon: document.getElementById("afternoon-timeslot"),
-//             evening: document.getElementById("evening-timeslot"),
-//           };
-
-//           addAvailabilityFunctionality(calendarAndDayDivs, timeslots);
-
-//           initailizeYearObserver();
-//           timeslots.morning.classList.remove("selected");
-//           timeslots.afternoon.classList.remove("selected");
-//           timeslots.evening.classList.remove("selected");
-
-//           pricingCards.forEach((card) => card.classList.remove("selected"));
-
-//           // Optionally, update the UI to reflect the held status
-//           // This could eventually redirect the user to a payment screen
-
-//           confirmationBox = document.getElementById("confirmation-box-wrapper");
-//           confirmationBox.classList.toggle("hidden");
-//           errorMessagePlace = document.getElementById("error-message");
-//           errorMessagePlace.classList.add("hidden");
-//           // window.location.href = '/payment';
-//           // document
-//           //   .getElementById(selectedDay.id)
-//           //   .querySelector(".dot")
-//           //   .classList.add("held");
-//         } catch (error) {
-//           console.error("Failed to confirm booking:", error);
-//         }
-//       } else {
-//         // Handle cases where no day or no timeslot is selected
-//         errorMessagePlace = document.getElementById("error-message");
-//         errorMessage = "Error";
-//         if (!inputEmailDiv.checkValidity() || inputEmail.length < 1) {
-//           errorMessage = "Please input a valid email";
-//         } else {
-//           errorMessage = `Please select a ${
-//             !selectedPricing
-//               ? "pricing option"
-//               : !selectedDay
-//               ? "day"
-//               : "timeslot"
-//           }`;
-//         }
-//         errorMessagePlace.classList.remove("hidden");
-//         errorMessagePlace.innerText = errorMessage;
-//       }
-//     });
-//   }
-// };
-
 function setupModalAndBooking() {
   // Modal element selections
   const continueBtn = document.getElementById("continue-booking");
   const modal = document.getElementById("confirmation-modal");
   const modalClose = document.getElementById("modal-close");
   const confirmBtn = document.getElementById("confirm-booking");
+  const thanksModal = document.getElementById("thanks-modal");
 
   // Show the modal when the Continue Booking button is clicked
   continueBtn.addEventListener("click", () => {
@@ -488,6 +351,10 @@ function setupModalAndBooking() {
 
   // Set up the Confirm Booking button to call the unified submission function
   confirmBtn.addEventListener("click", submitBooking);
+
+  thanksModal.addEventListener("click", () =>
+    thanksModal.classList.add("hidden")
+  );
 }
 
 /**
@@ -500,13 +367,15 @@ function setupModalAndBooking() {
 async function submitBooking() {
   // ---- Gather Modal Data (User Details) ----
   const firstName = document.getElementById("first-name").value.trim();
-  const lastName  = document.getElementById("last-name").value.trim();
-  const email     = document.getElementById("email").value.trim();
-  const phone     = document.getElementById("phone").value.trim();
+  const lastName = document.getElementById("last-name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
 
   // Check required fields: first name, last name, email
   if (!firstName || !lastName || !email) {
-    displayError("Please fill in all required fields (First Name, Last Name, Email).");
+    displayError(
+      "Please fill in all required fields (First Name, Last Name, Email)."
+    );
     return;
   } else {
     clearError();
@@ -559,23 +428,25 @@ async function submitBooking() {
   }
 
   // Verify the selected day has the chosen timeslot available
-  console.log(selectedDay)
-  console.log(selectedTimeslot)
+  console.log(selectedDay);
+  console.log(selectedTimeslot);
   const timeslotData = selectedDay.timeslots[selectedTimeslot];
   if (!timeslotData) {
-    displayError(`The selected timeslot (${selectedTimeslot}) is not available for the chosen day.`);
+    displayError(
+      `The selected timeslot (${selectedTimeslot}) is not available for the chosen day.`
+    );
     return;
   }
 
   // ---- Merge All Data for API Call ----
   const bookingData = {
-    timeslot_id: timeslotData,  // Timeslot ID from selected day object
-    status: "held",             // Fixed status for holding a timeslot
+    timeslot_id: timeslotData, // Timeslot ID from selected day object
+    status: "held", // Fixed status for holding a timeslot
     pricing_id: selectedPricing, // Selected pricing option
     first_name: firstName,
     last_name: lastName,
     email: email,
-    phone: phone               // Optional field; may be empty
+    phone: phone, // Optional field; may be empty
   };
 
   console.log("Booking data prepared:", bookingData);
@@ -587,7 +458,7 @@ async function submitBooking() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(bookingData)
+      body: JSON.stringify(bookingData),
     });
 
     if (!response.ok) {
@@ -601,6 +472,7 @@ async function submitBooking() {
     resetCalendarSelection();
     clearError();
     document.getElementById("confirmation-modal").classList.add("hidden");
+    document.getElementById("thanks-modal").classList.remove("hidden");
   } catch (error) {
     console.error("Failed to confirm booking:", error);
     displayError("Booking confirmation failed. Please try again.");
@@ -636,27 +508,11 @@ function resetCalendarSelection() {
   }
 
   const pricingCards = document.querySelectorAll(".pricing-card");
-  pricingCards.forEach(card => card.classList.remove("selected"));
+  pricingCards.forEach((card) => card.classList.remove("selected"));
 
   // Optionally, you could re-load calendar data here if needed.
 }
 
-
-// document.addEventListener("DOMContentLoaded", async () => {
-//   const datesList = loadCalendar();
-
-//   const calendarAndDayDivs = await loadAvailability(datesList);
-
-//   const timeslots = setupTimeslotCards(calendarAndDayDivs);
-
-//   addAvailabilityFunctionality(calendarAndDayDivs, timeslots);
-
-//   initailizeYearObserver();
-
-//   scrollToToday();
-
-//   setupConfirmButton(calendarAndDayDivs, timeslots);
-// });
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Initialize Calendar/Timeslot UI
   const datesList = loadCalendar(); // Loads the list of available dates
@@ -673,4 +529,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 2. Set up Modal and Booking Submission
   setupModalAndBooking();
 });
-

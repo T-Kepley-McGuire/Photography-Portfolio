@@ -1,0 +1,121 @@
+<!-- <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" /> -->
+
+<!-- <link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,200,0,0&icon_names=keyboard_arrow_down"
+/> -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,200,0,0"
+  rel="stylesheet"
+/>
+
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/portfolio.css') }}"
+/>
+<!-- <section class="title-card">
+  <h1>Here's some of my work</h1> -->
+<section
+  class="intro"
+  style="
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+  "
+>
+  <h2>My Work</h2>
+  <p>Explore my portfolio to see a range of my work</p>
+</section>
+<div class="down-arrow">
+  <p id="look-down-label" style="font-size: larger; color: black; transition: opacity 0.3s ease;">Portfolio</p>
+  <span id="look-down-arrow" class="material-symbols-rounded">
+    keyboard_arrow_down
+  </span>
+</div>
+<!-- </section> -->
+<div id="portfolio-container" class="grid">
+  <div class="grid-column"><div class="bottom-observer"></div></div>
+  <div class="grid-column"><div class="bottom-observer"></div></div>
+  <div class="grid-column"><div class="bottom-observer"></div></div>
+  <div class="grid-column"><div class="bottom-observer"></div></div>
+  <div class="grid-column"><div class="bottom-observer"></div></div>
+  <div class="grid-column"><div class="bottom-observer"></div></div>
+  <div class="grid-column"><div class="bottom-observer"></div></div>
+  <!-- More columns will be added dynamically -->
+</div>
+
+<div id="photos-modal" class="modal hidden">
+  <span id="left-arrow" class="material-symbols-rounded"> chevron_left </span>
+  <div class="modal-content">
+    <img
+      id="modal-image"
+      class="modal-image"
+      src="{{ url_for('static', filename='images/cover-photo.JPG')}}"
+      alt=""
+    />
+  </div>
+  <span id="right-arrow" class="material-symbols-rounded"> chevron_right </span>
+  <div id="background-clicker"></div>
+</div>
+
+<!-- <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script> -->
+
+<script src="{{ url_for('static', filename='js/portfolio.js')}}"></script>
+
+<!-- <script>
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const context = this;
+
+      // Clear the previous timeout
+      clearTimeout(timeout);
+
+      // Set a new timeout to execute the function after the wait time
+      timeout = setTimeout(() => {
+        func.apply(context, args);
+      }, wait);
+    };
+  }
+
+  function distributeImagesByColumnHeight(images, columns) {
+    // Array to track current column heights
+    const columnHeights = columns.map((col) => col.offsetHeight);
+
+    images.forEach((image) => {
+      // Find the index of the column with the minimum height
+      const minHeightIndex = columnHeights.indexOf(Math.min(...columnHeights));
+
+      // Append the image to that column
+      columns[minHeightIndex].appendChild(image);
+
+      // Update the height of that column
+      columnHeights[minHeightIndex] += image.offsetHeight;
+    });
+  }
+
+  // Your image redistribution function
+  function resizeAndRedistributeImages() {
+    // Grab all the images again
+    const images = Array.from(document.querySelectorAll(".photothumb")).sort(
+      (a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index)
+    );
+
+    // Clear columns for redistributing images
+    const container = document.getElementById("portfolio-container");
+    const computedStyle = window.getComputedStyle(container);
+
+    const numCols = computedStyle
+      .getPropertyValue("grid-template-columns")
+      .split(" ").length;
+
+    const allColumns = document.getElementsByClassName("grid-column");
+    const columns = [];
+    for (let i = 0; i < allColumns.length; i++) {
+      console.log(i);
+      // columns.push(allColumns[i]);
+      allColumns.style.display = i < numCols ? "flex" : "none";
+    }
+  }
+</script> -->

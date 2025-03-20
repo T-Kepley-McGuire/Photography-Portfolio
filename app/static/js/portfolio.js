@@ -30,8 +30,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     return { url: e, index: i };
   });
 
+  const modalImage = document.getElementById("modal-image");
+
   const arrow = document.getElementById("look-down-arrow");
+  const portText = document.getElementById("look-down-label");
   let arrowVisible = true;
+  let modalIndex = 0;
   redistributeColumns();
   previousNumCols = getNumberOfColumns();
   // Create the observer
@@ -41,12 +45,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (entry.isIntersecting && imageUrls.length > 0) {
           if (arrowVisible) {
             arrow.style.opacity = "0";
+            portText.style.opacity = "0";
             arrowVisible = false;
           }
           const newImage = document.createElement("img");
           newImage.classList.add("photothumb");
           newImage.alt = `Image ${imageUrls[0].index}`;
           newImage.src = imageUrls[0].url;
+          newImage.id = `Image ${imageUrls[0].index}`;
           imageUrls.splice(0, 1);
 
           // if (imageUrls.length === 0) {
@@ -56,6 +62,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           newImage.onload = function () {
             newImage.style.opacity = "1";
           };
+          newImage.addEventListener("click", () => {
+            console.log("here");
+            modalImage.parentElement.parentElement.classList.remove("hidden");
+            modalImage.src = newImage.src;
+            modalIndex = imageElements.length;
+          })
           imageElements.push(newImage);
           entry.target.before(newImage);
         }
@@ -63,10 +75,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
     { threshold: 0.5 }
   );
+  console.log(imageElements.length);
 
   // Select all elements with .swiper-coverup class and observe them
   const bots = document.querySelectorAll(".bottom-observer");
   bots.forEach((b) => observer.observe(b));
+
+  const leftArrow = document.getElementById("left-arrow");
+  leftArrow.addEventListener("click", () => {
+    console.log(imageElements.length);
+    console.log(`moved from ${modalIndex} to ${(modalIndex + imageElements.length - 1) % imageElements.length}`)
+    console.log(`, new src is ${imageElements[modalIndex]}`)
+    modalIndex = (modalIndex + imageElements.length - 1) % imageElements.length;
+    modalImage.src = imageElements[modalIndex].src;
+  })
+  const rightArrow = document.getElementById("right-arrow");
+  rightArrow.addEventListener("click", () => {
+    console.log(imageElements.length);
+    console.log(`moved from ${modalIndex} to ${(modalIndex + 1) % imageElements.length}`)
+    console.log(`, new src is ${imageElements[modalIndex]}`)
+    modalIndex = (modalIndex + 1) % imageElements.length;
+    modalImage.src = imageElements[modalIndex].src;
+  })
+
+  const backgroundClicker = document.getElementById("background-clicker");
+  backgroundClicker.addEventListener("click", () => {
+    console.log("here");
+    modalImage.parentElement.parentElement.classList.add("hidden");
+  })
 });
 
 // Function to get the number of columns in the grid
@@ -141,6 +177,22 @@ window.addEventListener("resize", () => {
   }
 });
 
+
+
+function getAllImagesForSlideshow() {
+  const grid = document.querySelector(".grid");
+
+  // Get all the old columns
+  const oldColumns = Array.from(grid.children);
+
+  // Collect all images from the old columns (excluding the last child of each column)
+  const allImages = [];
+
+  oldColumns.forEach((column) => {
+    const images = Array.from(column.children).slice(0, -1); // Exclude last child
+    allImages.push(...images); // Flatten the images into one list
+  });
+}
 // Debounce the resize event to avoid excessive recalculations
 // let resizeTimeout;
 // window.addEventListener('resize', function () {
