@@ -11,6 +11,7 @@ import json
 main = Blueprint('main', __name__)
 
 
+
 @main.route('/')
 def index():
     return render_template('index.html')
@@ -21,8 +22,8 @@ def pricing():
     return render_template('pricing.html')
 
 
-@main.route('/portfolio')
-def portfolio():
+# @main.route('/portfolio')
+# def portfolio():
     # photos_path = os.path.join(current_app.static_folder, 'images/photos')
 
     # # Grab all subfolders within the photos directory
@@ -79,8 +80,8 @@ def images():
 
 
 # @main.route('/about')
-def about():
-    return render_template('about.html')
+# def about():
+#     return render_template('about.html')
 
 
 @main.route('/api/pricing')

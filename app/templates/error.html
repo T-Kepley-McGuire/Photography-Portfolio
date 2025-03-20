@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'include.html' %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/index.css')}}">
+</head>
+<body>
+    {% include 'banner.html' %}
+    
+    <main style="display: flex;flex-direction: column;justify-content: center;align-items: center; ">
+        <h2>Error 404</h2>
+        <p>Sorry, this page doesn't seem to exist</p>
+
+    </main>
+    {% include 'footer.html' %}
+</body>
+</html>
