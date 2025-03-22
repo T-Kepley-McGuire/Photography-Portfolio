@@ -42,8 +42,16 @@ class Config:
     if MODE == 'development':
         SQLALCHEMY_DATABASE_URI = f'sqlite:///{os.path.join(basedir, "instance", "development.db")}'
     else:
-        # In production, expect DATABASE_URL from Supabase or Vercel
-        SQLALCHEMY_DATABASE_URI = os.getenv('POSTGRES_URL')
+        raw_database_url = os.getenv('POSTGRES_URL')
+
+        if raw_database_url is None:
+            raise ValueError("POSTGRES_URL environment variable is not set!")
+
+        # Fix the dialect prefix if needed
+        if raw_database_url.startswith('postgres://'):
+            raw_database_url = raw_database_url.replace('postgres://', 'postgresql://', 1)
+
+        SQLALCHEMY_DATABASE_URI = raw_database_url
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
