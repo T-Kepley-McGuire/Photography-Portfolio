@@ -246,7 +246,7 @@ def update_timeslot_status():
         sendEmail(
             recipientEmail="lizzymare00@gmail.com",
             subject=f'Photography Booking with {first_name} {last_name}',
-            body=f'{first_name} {last_name} has book an appointment with you for {timeslot} of {dateString}\nEmail: {email}\n{pricingOptionString}'
+            body=f'{first_name} {last_name} has booked an appointment with you for {timeslot} of {dateString}\nEmail: {email}\n{pricingOptionString}'
         )
 
         return jsonify({"message": "Timeslot held successfully"}), 200
