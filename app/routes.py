@@ -10,6 +10,27 @@ import json
 
 main = Blueprint('main', __name__)
 
+pricing_data = [
+    {
+        'id': 1,
+        'name': "Minis",
+        'description': "20 min session with minimum of 10 edited photos",
+        'holdPrice': 30,
+        'price': 80
+    }, {
+        'id': 2,
+        'name': "Standard",
+        'description': "40 min session with minimum of 20 edited photos",
+        'holdPrice': 30,
+        'price': 150
+    }, {
+        'id': 3,
+        'name': "Extended",
+        'description': "1 hour session with minimum of 30 edited photos",
+        'holdPrice': 30,
+        'price': 210
+    }
+]
 
 
 @main.route('/')
@@ -56,7 +77,7 @@ def pricing():
     #     }
 
     # Render the template and pass the gallery_data
-    return render_template('portfolio.html')  # , gallery_data=gallery_data)
+    # return render_template('portfolio.html')  # , gallery_data=gallery_data)
 
 
 @main.route('/portfolio/images')
@@ -86,20 +107,21 @@ def images():
 
 @main.route('/api/pricing')
 def get_pricing():
-    pricing_options: list[PricingOption] = PricingOption.query.all()
-    pricing_data = [
-        {
-            'id': option.id,
-            'name': option.name,
-            'description': option.description,
-            'holdPrice': 0 if option.hold_price is None else option.hold_price,
-            'price': option.price
-        } for option in pricing_options
-    ]
+    # pricing_options: list[PricingOption] = PricingOption.query.all()
+    # pricing_data = [
+    #     {
+    #         'id': option.id,
+    #         'name': option.name,
+    #         'description': option.description,
+    #         'holdPrice': 0 if option.hold_price is None else option.hold_price,
+    #         'price': option.price
+    #     } for option in pricing_options
+    # ]
     return jsonify(pricing_data)
 
 
 HOLD_DURATION = timedelta(minutes=30)
+
 
 @main.route('/api/update_timeslot_status', methods=['PUT'])
 def update_timeslot_status():
@@ -107,14 +129,16 @@ def update_timeslot_status():
     data = request.get_json()
 
     # --- Basic request validation ---
-    required_fields = ['pricing_id', 'status',
-                       'timeslot_id', 'first_name', 'last_name', 'email']
+    required_fields = ['pricing_id',
+                       'timeslot', 'dates', 'first_name', 'last_name', 'email']
     if not data or not all(field in data for field in required_fields):
         return jsonify({"error": "Missing required fields"}), 400
 
     # --- Extract and sanitize data ---
-    timeslot_id = data.get('timeslot_id')
-    new_status = data.get('status')
+    # timeslot_id = data.get('timeslot_id')
+    dates = data.get("dates")
+    timeslot = data.get("timeslot")
+    # new_status = data.get('status')
     pricing_id = data.get('pricing_id')
 
     first_name = data.get('first_name', '').strip()[:255]
@@ -132,8 +156,8 @@ def update_timeslot_status():
         return jsonify({"error": "Invalid email address"}), 400
 
     # --- Validate status value ---
-    if new_status != 'held':
-        return jsonify({"error": "Invalid status value"}), 400
+    # if new_status != 'held':
+    #     return jsonify({"error": "Invalid status value"}), 400
 
     # --- Store session data ---
     session.clear()                    # Clears any previous session data
@@ -141,74 +165,78 @@ def update_timeslot_status():
     session.modified = True
 
     # --- Find or create user ---
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        user = User(email=email, first_name=first_name, last_name=last_name)
-        db.session.add(user)
-        db.session.commit()
-    else:
-        # Update first and last name if already exists
-        user.first_name = first_name
-        user.last_name = last_name
-        db.session.commit()
+    # user = User.query.filter_by(email=email).first()
+    # if not user:
+    #     user = User(email=email, first_name=first_name, last_name=last_name)
+    #     db.session.add(user)
+    #     db.session.commit()
+    # else:
+    #     # Update first and last name if already exists
+    #     user.first_name = first_name
+    #     user.last_name = last_name
+    #     db.session.commit()
 
     # --- Clear any existing held timeslots ---
-    clear_timeslots_held_by_user(user)
+    # clear_timeslots_held_by_user(user)
 
     # --- Retrieve the timeslot ---
-    timeslot = AvailableTimeSlot.query.get(timeslot_id)
-    if not timeslot:
-        return jsonify({"error": "Timeslot not found"}), 404
+    # timeslot = AvailableTimeSlot.query.get(timeslot_id)
+    # if not timeslot:
+    #     return jsonify({"error": "Timeslot not found"}), 404
 
     # --- Validate that the timeslot belongs to the correct day (future proofing) ---
     # if not is_timeslot_valid_for_day(timeslot, data.get('day_id')):
     #     return jsonify({"error": "Timeslot does not belong to the specified day"}), 400
 
     # --- Check if the timeslot is currently available ---
-    if timeslot.status != 'available':
-        return jsonify({"error": "Timeslot is not available"}), 400
+    # if timeslot.status != 'available':
+    #     return jsonify({"error": "Timeslot is not available"}), 400
 
     # --- Retrieve and validate pricing option ---
-    pricing = PricingOption.query.get(pricing_id)
+    pricing = None
+    for po in pricing_data:
+        if po["id"] == pricing_id:
+            pricing = po
+    # pricing = pricing_data.[po if po["id"] == pricing_id for po in pricing_data][0] # PricingOption.query.get(pricing_id)
     if not pricing:
         return jsonify({"error": "Pricing option not found"}), 404
 
     # --- Update timeslot and user holding info ---
-    timeslot.status = 'held'
-    user.held_timeslot = timeslot_id
-    user.hold_until = datetime.now() + HOLD_DURATION
-    user.held_price = pricing_id
-
+    # timeslot.status = 'held'
+    # user.held_timeslot = timeslot_id
+    # user.hold_until = datetime.now() + HOLD_DURATION
+    # user.held_price = pricing_id
     try:
         # --- Commit changes to the database ---
-        db.session.commit()
+        # db.session.commit()
 
         # --- Send confirmation email ---
         emailUser = os.getenv('EMAIL_ADDRESS')
         emailPass = os.getenv('EMAIL_PASSWORD')
 
         yag = yagmail.SMTP(user=emailUser, password=emailPass)
-
+        dateString = dates[0] if len(dates) == 1 else f'{dates[0]} or {dates[1]}' if len(
+            dates) == 2 else f'{dates[0]}, {dates[1]}, or {dates[2]}'
+        pricingOptionString = f'Pricing Option: {pricing["name"]}\n{pricing["description"]}\nHolding Price: {pricing["holdPrice"]}\nPrice: {pricing["price"]}'
         def sendEmail(recipientEmail, subject, body=None, attachments=None):
             try:
                 # Send the email with first and last name now in the template
                 yag.send(
                     to=recipientEmail,
                     subject=subject,
-                    contents= body if body is not None else
+                    contents=body if body is not None else
                     render_template(
                         'confirmation.html',
-                        user=user,
-                        timeslot=str(timeslot),
-                        first_name=user.first_name,
-                        last_name=user.last_name,
-                        current_year= datetime.now().strftime("%Y")
+                        # user=user,
+                        timeslot=f'{timeslot} of {dateString}',
+                        first_name=first_name,
+                        last_name=last_name,
+                        current_year=datetime.now().strftime("%Y")
                     ),
                     attachments=attachments
                 )
-                print(f"Email sent successfully to {recipientEmail}!")
             except Exception as e:
-                print(f"Failed to send email: {e}")
+                pass # print(f"Failed to send email: {e}")
 
         # Send the confirmation email
         sendEmail(
@@ -217,8 +245,8 @@ def update_timeslot_status():
         )
         sendEmail(
             recipientEmail="lizzymare00@gmail.com",
-            subject=f'Photography Booking with {user.first_name} {user.last_name}',
-            body=f'{user.first_name} {user.last_name} has book an appointment with you for {str(timeslot)}\nEmail: {email}'
+            subject=f'Photography Booking with {first_name} {last_name}',
+            body=f'{first_name} {last_name} has book an appointment with you for {timeslot} of {dateString}\nEmail: {email}\n{pricingOptionString}'
         )
 
         return jsonify({"message": "Timeslot held successfully"}), 200
@@ -249,7 +277,7 @@ def get_available_dates():
     # if not user:
     #     return jsonify({"error": "Please enter your email first."}), 400
 
-    update_expired_timeslots()
+    # update_expired_timeslots()
 
     available_timeslots = (
         db.session.query(AvailableTimeSlot)
@@ -362,6 +390,7 @@ def get_timeslot_held_by_user(user: User):
         return None  # Timeslot not found in the database
 
     return held_timeslot.to_dict()  # Assuming you want to return a dict, not the object
+
 
 def is_valid_email(email):
     """

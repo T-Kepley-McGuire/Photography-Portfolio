@@ -2,6 +2,7 @@ const loadCalendar = () => {
   const datesList = [];
 
   const today = new Date();
+  today.setDate(today.getDate() + 6);
   const beginningTodaysWeek = new Date();
   beginningTodaysWeek.setDate(today.getDate() - today.getDay());
   const beginningFourWeeksAgo = new Date();
@@ -13,6 +14,8 @@ const loadCalendar = () => {
   const grid = document.getElementById("calendar-grid");
   grid.innerHTML = "";
 
+  // const selectedDates = [];
+
   if (grid)
     for (let i = 0; i < 52 * 7 + 6 + 5 * 7; i++) {
       // Create the day div
@@ -22,6 +25,11 @@ const loadCalendar = () => {
       dayDiv.classList.add("grid-day");
       if (workingDate.getTime() <= today.getTime())
         dayDiv.classList.add("past");
+      else {
+        dayDiv.setAttribute("data-selectable", "");
+        dayDiv.setAttribute("data-date", workingDate.toDateString());
+        dayDiv.classList.add("available");
+      }
       if (workingDate.toDateString() == today.toDateString())
         dayDiv.setAttribute("data-day", "today");
       dayDiv.innerText = `${workingDate.getDate()}`;
@@ -82,71 +90,71 @@ const loadAvailability = async (datesList) => {
   const calendarAndDayDivs = [];
 
   // Fetch calendar data from the backend API
-  await fetch("/api/available_dates")
-    .then((response) => response.json())
-    .then((data) => {
-      calendarData = data;
-      console.log(calendarData);
-    })
-    .catch((error) => console.error("Error fetching available dates:", error));
+  // await fetch("/api/available_dates")
+  //   .then((response) => response.json())
+  //   .then((data) => {
+  //     calendarData = data;
+  //     console.log(calendarData);
+  //   })
+  //   .catch((error) => console.error("Error fetching available dates:", error));
 
-  // Iterate over the calendarData and match it with datesList
-  calendarData.forEach((calendarEntry, index) => {
-    // Convert the calendar entry date (which is a string) back into a Date object
-    const entryDate = new Date(
-      calendarEntry.year,
-      calendarEntry.month - 1,
-      calendarEntry.day
-    );
+  // // Iterate over the calendarData and match it with datesList
+  // calendarData.forEach((calendarEntry, index) => {
+  //   // Convert the calendar entry date (which is a string) back into a Date object
+  //   const entryDate = new Date(
+  //     calendarEntry.year,
+  //     calendarEntry.month - 1,
+  //     calendarEntry.day
+  //   );
 
-    // Check if there is a matching date in datesList
-    const matchingDate = datesList.find((dateObj) => {
-      return (
-        entryDate.getTime() > Date.now() &&
-        dateObj.date.getFullYear() === entryDate.getFullYear() &&
-        dateObj.date.getMonth() === entryDate.getMonth() &&
-        dateObj.date.getDate() === entryDate.getDate()
-      );
-    });
+  //   // Check if there is a matching date in datesList
+  //   const matchingDate = datesList.find((dateObj) => {
+  //     return (
+  //       entryDate.getTime() > Date.now() &&
+  //       dateObj.date.getFullYear() === entryDate.getFullYear() &&
+  //       dateObj.date.getMonth() === entryDate.getMonth() &&
+  //       dateObj.date.getDate() === entryDate.getDate()
+  //     );
+  //   });
 
-    // If a matching date is found, add the class .available to the corresponding element
-    if (matchingDate) {
-      const dayElement = matchingDate.element;
+  // If a matching date is found, add the class .available to the corresponding element
+  //   // if (matchingDate) {
+  //   //   const dayElement = matchingDate.element;
 
-      // Add availability indicators (dot) and set the date as selectable
-      dayElement.classList.add("available");
-      dayElement.id = `day-${index}`;
-      const dot = document.createElement("div");
-      dot.className = "dot";
-      dayElement.appendChild(dot);
-      dayElement.setAttribute("data-selectable", "");
+  //   //   // Add availability indicators (dot) and set the date as selectable
+  //   //   dayElement.classList.add("available");
+  //   //   dayElement.id = `day-${index}`;
+  //   //   // const dot = document.createElement("div");
+  //   //   // dot.className = "dot";
+  //   //   // dayElement.appendChild(dot);
+  //   //   dayElement.setAttribute("data-selectable", "");
 
-      // Set up the timeslot structure
-      const timeslots = {};
-      //   morning: false,  // Default to false, assuming unavailable
-      //   afternoon: false,
-      //   evening: false,
-      // };
+  //   //   // Set up the timeslot structure
+  //   //   const timeslots = {};
+  //   //   //   morning: false,  // Default to false, assuming unavailable
+  //   //   //   afternoon: false,
+  //   //   //   evening: false,
+  //   //   // };
 
-      // Populate available timeslots based on the API response
-      if (calendarEntry.time_slots.morning)
-        timeslots.morning = calendarEntry.time_slots.morning;
+  //   //   // Populate available timeslots based on the API response
+  //   //   if (calendarEntry.time_slots.morning)
+  //   //     timeslots.morning = calendarEntry.time_slots.morning;
 
-      if (calendarEntry.time_slots.afternoon)
-        timeslots.afternoon = calendarEntry.time_slots.afternoon;
+  //   //   if (calendarEntry.time_slots.afternoon)
+  //   //     timeslots.afternoon = calendarEntry.time_slots.afternoon;
 
-      if (calendarEntry.time_slots.evening)
-        timeslots.evening = calendarEntry.time_slots.evening;
+  //   //   if (calendarEntry.time_slots.evening)
+  //   //     timeslots.evening = calendarEntry.time_slots.evening;
 
-      // Add the structured date and timeslot data to the array
-      calendarAndDayDivs.push({
-        // element: dayElement, // The day HTML element
-        date: entryDate, // The actual date object
-        id: `day-${index}`, // The unique ID for this date from the backend
-        timeslots: timeslots, // The timeslot data (morning, afternoon, evening)
-      });
-    }
-  });
+  //   //   // Add the structured date and timeslot data to the array
+  //   //   calendarAndDayDivs.push({
+  //   //     // element: dayElement, // The day HTML element
+  //   //     date: entryDate, // The actual date object
+  //   //     id: `day-${index}`, // The unique ID for this date from the backend
+  //   //     timeslots: timeslots, // The timeslot data (morning, afternoon, evening)
+  //   //   });
+  //   // }
+  // });
   return calendarAndDayDivs;
 };
 
@@ -209,34 +217,42 @@ const setupTimeslotCards = (calendarAndDayDivs) => {
   return timeslotDivs;
 };
 
-const addAvailabilityFunctionality = (calendarAndDayDivs, timeslots) => {
+const addAvailabilityFunctionality = (
+  calendarAndDayDivs,
+  timeslots,
+  selectedDates
+) => {
   const availableDays = document.getElementsByClassName("grid-day available");
 
-  for (const cadd of calendarAndDayDivs) {
+  for (const cadd of availableDays) {
     //.forEach((availableDay) => {
-    const availableDay = document.getElementById(cadd.id);
-    availableDay.addEventListener("click", function () {
-      timeslots.morning?.classList.remove("disabled");
-      timeslots.afternoon?.classList.remove("disabled");
-      timeslots.evening?.classList.remove("disabled");
-      // If the card is already selected, deselect it
-      if (!cadd.timeslots.morning) timeslots.morning?.classList.add("disabled");
-      if (!cadd.timeslots.afternoon)
-        timeslots.afternoon?.classList.add("disabled");
-      if (!cadd.timeslots.evening) timeslots.evening?.classList.add("disabled");
+    const availableDay = cadd; //document.getElementById(cadd.id);
+    availableDay.addEventListener("click", () => {
+      // timeslots.morning?.classList.remove("disabled");
+      // timeslots.afternoon?.classList.remove("disabled");
+      // timeslots.evening?.classList.remove("disabled");
+      // // If the card is already selected, deselect it
+      // if (!cadd.timeslots.morning) timeslots.morning?.classList.add("disabled");
+      // if (!cadd.timeslots.afternoon)
+      //   timeslots.afternoon?.classList.add("disabled");
+      // if (!cadd.timeslots.evening) timeslots.evening?.classList.add("disabled");
 
       if (availableDay.classList.contains("selected")) {
         availableDay.classList.remove("selected");
-        timeslots.morning?.classList.remove("disabled");
-        timeslots.afternoon?.classList.remove("disabled");
-        timeslots.evening?.classList.remove("disabled");
+        selectedDates = selectedDates.filter((date) => date != availableDay);
+        // timeslots.morning?.classList.remove("disabled");
+        // timeslots.afternoon?.classList.remove("disabled");
+        // timeslots.evening?.classList.remove("disabled");
       } else {
         // Deselect any other selected cards
-        for (const a of availableDays) {
-          a.classList.remove("selected");
+        console.log(selectedDates);
+        if (selectedDates.length >= 3) {
+          selectedDates[0].classList.remove("selected");
+          selectedDates.shift();
         }
-        // Select the clicked card
+
         availableDay.classList.add("selected");
+        selectedDates.push(availableDay);
       }
     });
   }
@@ -382,30 +398,45 @@ async function submitBooking() {
   }
 
   // ---- Retrieve Calendar/Selection Data ----
-  const calendarAndDayDivs = window.calendarAndDayDivs;
-  const timeslots = window.timeslots;
+  const selectedDayDivs = document.getElementsByClassName(
+    "grid-day available selected"
+  );
+  const selectedDays = [];
+  // const timeslots = window.timeslots;
 
   // Find the selected day
-  let selectedDay = null;
-  for (const dayObj of calendarAndDayDivs) {
-    const dayElem = document.getElementById(dayObj.id);
-    if (dayElem && dayElem.classList.contains("selected")) {
-      selectedDay = dayObj;
-      break;
-    }
-  }
-  if (!selectedDay) {
+  // let selectedDay = [];
+  // for (const dayObj of availableDays) {
+  //   const dayElem = document.getElementById(dayObj.id);
+  //   if (dayElem && dayElem.classList.contains("selected")) {
+  //     selectedDay = dayObj;
+  //     break;
+  //   }
+  // }
+  if (selectedDayDivs.length == 0) {
     displayError("Please select a day.");
     return;
+  } else {
+    for (let i = 0; i < selectedDayDivs.length; i++) {
+      console.log(selectedDayDivs[i].getAttribute("data-date"));
+      selectedDays.push(selectedDayDivs[i].getAttribute("data-date"));
+    }
+    // selectedDays = selectedDays.map(sd => sd.getAttribute("data-date"))
   }
 
   // Determine the selected timeslot
   let selectedTimeslot = null;
-  if (timeslots.morning.classList.contains("selected")) {
+  if (
+    document.getElementById("morning-timeslot").classList.contains("selected")
+  ) {
     selectedTimeslot = "morning";
-  } else if (timeslots.afternoon.classList.contains("selected")) {
+  } else if (
+    document.getElementById("afternoon-timeslot").classList.contains("selected")
+  ) {
     selectedTimeslot = "afternoon";
-  } else if (timeslots.evening.classList.contains("selected")) {
+  } else if (
+    document.getElementById("evening-timeslot").classList.contains("selected")
+  ) {
     selectedTimeslot = "evening";
   }
   if (!selectedTimeslot) {
@@ -415,7 +446,7 @@ async function submitBooking() {
 
   // Retrieve the selected pricing option from pricing cards
   let selectedPricing = null;
-  const pricingCards = document.querySelectorAll(".pricing-card");
+  const pricingCards = document.getElementsByClassName("pricing-card");
   for (const card of pricingCards) {
     if (card.classList.contains("selected")) {
       selectedPricing = Number(card.getAttribute("data-pricing-id"));
@@ -428,20 +459,21 @@ async function submitBooking() {
   }
 
   // Verify the selected day has the chosen timeslot available
-  console.log(selectedDay);
-  console.log(selectedTimeslot);
-  const timeslotData = selectedDay.timeslots[selectedTimeslot];
-  if (!timeslotData) {
-    displayError(
-      `The selected timeslot (${selectedTimeslot}) is not available for the chosen day.`
-    );
-    return;
-  }
+  // console.log(selectedDay);
+  // console.log(selectedTimeslot);
+  // const timeslotData = selectedDay.timeslots[selectedTimeslot];
+  // if (!timeslotData) {
+  //   displayError(
+  //     `The selected timeslot (${selectedTimeslot}) is not available for the chosen day.`
+  //   );
+  //   return;
+  // }
 
   // ---- Merge All Data for API Call ----
   const bookingData = {
-    timeslot_id: timeslotData, // Timeslot ID from selected day object
-    status: "held", // Fixed status for holding a timeslot
+    dates: selectedDays, // Timeslot ID from selected day object
+    timeslot: selectedTimeslot,
+    // status: "held", // Fixed status for holding a timeslot
     pricing_id: selectedPricing, // Selected pricing option
     first_name: firstName,
     last_name: lastName,
@@ -451,6 +483,10 @@ async function submitBooking() {
 
   console.log("Booking data prepared:", bookingData);
 
+  submitButton = document.getElementById("confirm-booking");
+  console.log(submitButton);
+  submitButton.classList.add("disabled");
+  submitButton.disabled = true;
   // ---- Perform the API Call ----
   try {
     const response = await fetch(`/api/update_timeslot_status`, {
@@ -477,6 +513,9 @@ async function submitBooking() {
     console.error("Failed to confirm booking:", error);
     displayError("Booking confirmation failed. Please try again.");
   }
+
+  submitButton.classList.remove("disabled");
+  submitButton.disabled = false;
 }
 
 /**
@@ -515,10 +554,11 @@ function resetCalendarSelection() {
 
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Initialize Calendar/Timeslot UI
+  const selectedDates = [];
   const datesList = loadCalendar(); // Loads the list of available dates
   const calendarAndDayDivs = await loadAvailability(datesList); // Loads day elements with timeslots
   const timeslots = setupTimeslotCards(calendarAndDayDivs); // Sets up timeslot card UI elements
-  addAvailabilityFunctionality(calendarAndDayDivs, timeslots); // Enables click/selection functionality
+  addAvailabilityFunctionality(calendarAndDayDivs, timeslots, selectedDates); // Enables click/selection functionality
   initailizeYearObserver();
   scrollToToday();
 

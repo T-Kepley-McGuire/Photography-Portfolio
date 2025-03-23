@@ -17,7 +17,7 @@ h2 {
 }
 
 .section-header > h2 {
-  margin-block: 50px 25px;
+  margin-block: 50px 15px;
 }
 
 
@@ -604,4 +604,10 @@ input:invalid {
   & > input {
     margin-left: 10px;
   }
+}
+
+.disabled {
+  background-color: rgb(168, 168, 168);
+  cursor: not-allowed;
+
 }
