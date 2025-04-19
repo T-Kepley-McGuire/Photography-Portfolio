@@ -5,3 +5,4 @@ datetime
 python-dotenv
 psycopg2-binary
 yagmail
+flask_cors
