@@ -110,6 +110,10 @@ def homeAlt():
 # def about():
 #     return render_template('about.html')
 
+@main.route('/ping')
+@cross_origin()
+def ping():
+    return jsonify("pong")
 
 @main.route('/api/pricing')
 @cross_origin()
