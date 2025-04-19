@@ -17,19 +17,19 @@ pricing_data = [
         'id': 1,
         'name': "Minis",
         'description': "20 min session with minimum of 10 edited photos",
-        'holdPrice': 30,
+        'holdPrice': 50,
         'price': 125
     }, {
         'id': 2,
         'name': "Standard",
         'description': "40 min session with minimum of 20 edited photos",
-        'holdPrice': 30,
+        'holdPrice': 50,
         'price': 225
     }, {
         'id': 3,
         'name': "Extended",
         'description': "1 hour session with minimum of 30 edited photos",
-        'holdPrice': 30,
+        'holdPrice': 50,
         'price': 330
     }
 ]
