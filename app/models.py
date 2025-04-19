@@ -57,3 +57,5 @@ class AvailableTimeSlot(db.Model):
 
         return f'the {self.timeslot} of {timeslot_date}'
 
+#TODO: remove date table, make date_id to be just a date, make status and timeslot into enums. see https://stackoverflow.com/questions/2676133/best-way-to-do-enum-in-sqlalchemy
+#Qs: string doesnt matter maybe

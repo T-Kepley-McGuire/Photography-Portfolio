@@ -1,4 +1,5 @@
 from flask import session
+from flask_cors import CORS, cross_origin
 from flask.sessions import SecureCookieSessionInterface
 import yagmail
 from datetime import datetime, timedelta
@@ -7,6 +8,7 @@ from app.models import PricingOption, Date, AvailableTimeSlot, User, db
 import os
 import re
 import json
+import calendar
 
 main = Blueprint('main', __name__)
 
@@ -81,6 +83,7 @@ def pricing():
 
 
 @main.route('/portfolio/images')
+@cross_origin()
 def images():
     # Define the path to the portfolio folder
     portfolio_folder = os.path.join(
@@ -99,6 +102,9 @@ def images():
     # Return the list of image URLs as a JSON array
     return jsonify(image_list)
 
+@main.route('/homeAlt')
+def homeAlt():
+    return render_template('homeAlt.html')
 
 # @main.route('/about')
 # def about():
@@ -106,6 +112,7 @@ def images():
 
 
 @main.route('/api/pricing')
+@cross_origin()
 def get_pricing():
     # pricing_options: list[PricingOption] = PricingOption.query.all()
     # pricing_data = [
@@ -124,6 +131,7 @@ HOLD_DURATION = timedelta(minutes=30)
 
 
 @main.route('/api/update_timeslot_status', methods=['PUT'])
+@cross_origin()
 def update_timeslot_status():
     # --- Parse the request data ---
     data = request.get_json()
@@ -255,8 +263,130 @@ def update_timeslot_status():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+@main.route("/api/submit-booking", methods=["POST"])
+@cross_origin()
+def submit_booking():
+    data = request.get_json()
+
+    # 1. Required fields present and not empty
+    required_fields = ["name", "email", "phone", "packageId", "timeslots"]
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return jsonify({"error": f"Missing or empty field: {field}"}), 400
+
+    # 2. Validate packageId
+    matching_package = next((p for p in pricing_data if p['id'] == data["packageId"]), None)
+    if not matching_package:
+        return jsonify({"error": "Invalid packageId"}), 400
+
+    # 3. Validate timeslots
+    timeslots = data["timeslots"]
+    if not isinstance(timeslots, list) or len(timeslots) == 0:
+        return jsonify({"error": "timeslots must be a non-empty list"}), 400
+
+    now = datetime.now()
+
+    for ts in timeslots:
+        # Ensure keys exist
+        if not all(k in ts for k in ["date", "morning", "afternoon", "evening"]):
+            return jsonify({"error": "Invalid timeslot structure"}), 400
+
+        # Ensure at least one time period is selected
+        if not (ts["morning"] or ts["afternoon"] or ts["evening"]):
+            return jsonify({"error": "At least one of morning/afternoon/evening must be selected"}), 400
+
+        date = ts["date"]
+        if not all(k in date for k in ["year", "month", "day"]):
+            return jsonify({"error": "Invalid date structure in timeslot"}), 400
+
+        # Parse date and check it's in the future
+        month_num = parse_month(date["month"])
+        if not month_num:
+            return jsonify({"error": f"Invalid month format: {date['month']}"}), 400
+
+        try:
+            slot_date = datetime(int(date["year"]), month_num, int(date["day"]))
+        except ValueError:
+            return jsonify({"error": f"Invalid calendar date: {date}"}), 400
+
+        if slot_date <= now:
+            return jsonify({"error": "Date must be in the future"}), 400
+
+    # ✅ All checks passed
+    print("Validated payload:")
+    print(data)
+    print("Selected package:")
+    print(matching_package)
+
+    # return jsonify({"status": "success", "message": "Booking validated", "selectedPackage": matching_package}), 200
+    try:
+    # --- Commit booking to database here, if needed ---
+    # db.session.commit()
+
+    # --- Prepare email sending ---
+        emailUser = os.getenv('EMAIL_ADDRESS')
+        emailPass = os.getenv('EMAIL_PASSWORD')
+        yag = yagmail.SMTP(user=emailUser, password=emailPass)
+
+        # --- Format timeslot and pricing information ---
+        formattedTimeslots = formatTimeslots(data["timeslots"])  # <- helper function
+        pricingOption = matching_package  # already found in earlier validation
+        pricingString = (
+            f"Pricing Option: {pricingOption['name']}\n"
+            f"{pricingOption['description']}\n"
+            f"Holding Price: ${pricingOption['holdPrice']}\n"
+            f"Total Price: ${pricingOption['price']}"
+        )
+
+        # --- Send confirmation emails ---
+        def sendEmail(recipientEmail, subject, body=None, attachments=None):
+            try:
+                yag.send(
+                    to=recipientEmail,
+                    subject=subject,
+                    contents=body if body is not None else
+                    render_template(
+                        'confirmation-new.html',
+                        first_name=data["name"].split()[0],  # crude first name extraction
+                        last_name=' '.join(data["name"].split()[1:]) or '',  # crude last name fallback
+                        timeslot=formattedTimeslots,
+                        current_year=datetime.now().strftime("%Y")
+                    ),
+                    attachments=attachments
+                )
+            except Exception as e:
+                pass  # You can log or print the exception here
+
+        # Send to user
+        sendEmail(
+            recipientEmail=data["email"],
+            subject="Booking Confirmation"
+        )
+
+        # Send to you (admin/staff)
+        sendEmail(
+            recipientEmail="lizzymare00@gmail.com",
+            subject=f"Photography Booking with {data['name']}",
+            body=(
+                f"{data['name']} has booked an appointment.\n"
+                f"Timeslot(s): {formattedTimeslots}\n"
+                f"Email: {data['email']}\n"
+                f"{pricingString}"
+            )
+        )
+
+        return jsonify({"message": "Timeslot held successfully"}), 200
+
+    except Exception as e:
+        # Roll back any DB changes
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
+
+
 
 @main.route('/api/held_timeslot')
+@cross_origin()
 def held_timeslot():
     data = request.get_json()
 
@@ -272,6 +402,7 @@ def held_timeslot():
 
 
 @main.route('/api/available_dates')
+@cross_origin()
 def get_available_dates():
     # user: User = get_user_by_session()
     # if not user:
@@ -307,6 +438,50 @@ def get_available_dates():
     ]
 
     return jsonify(date_timeslot_list)
+
+
+from datetime import datetime
+
+def formatTimeslots(timeslots: list) -> str:
+    """
+    Convert a list of timeslot dictionaries into a human-readable string.
+    Example output:
+        April 23, 2025 (Morning)
+        April 24, 2025 (Afternoon, Evening)
+    """
+    formatted = []
+
+    for ts in timeslots:
+        date_dict = ts.get("date", {})
+        year = date_dict.get("year")
+        month_str = date_dict.get("month")
+        day = date_dict.get("day")
+
+        # Convert JS-style short month name to full month name with datetime
+        try:
+            parsed_date = datetime.strptime(f"{month_str} {day} {year}", "%b %d %Y")
+            formatted_date = parsed_date.strftime("%B %d, %Y")
+        except ValueError:
+            formatted_date = f"{month_str} {day}, {year}"  # fallback in case of error
+
+        slots = []
+        if ts.get("morning"): slots.append("Morning")
+        if ts.get("afternoon"): slots.append("Afternoon")
+        if ts.get("evening"): slots.append("Evening")
+
+        if slots:
+            formatted.append(f"{formatted_date} ({', '.join(slots)})")
+
+    return formatted
+
+
+
+
+def parse_month(month_str):
+    try:
+        return list(calendar.month_abbr).index(month_str[:3])
+    except ValueError:
+        return None
 
 
 def build_date_dict(date_id, timeslots):

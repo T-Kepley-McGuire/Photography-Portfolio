@@ -1,0 +1,63 @@
+body {
+  position: relative;
+}
+
+.hero {
+  position: relative;
+  width: 100vw;
+  height: 60vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow: hidden;
+}
+
+.hero > *:not(.cover-photo) {
+  margin-top: 50px;
+}
+
+.hero h1 {
+  mix-blend-mode: multiply;
+  font-size: 37px;
+  /* padding-top: 75px;
+    margin-bottom: 20px;
+    margin-left: 10%; */
+  text-align: center;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hero p {
+  mix-blend-mode: multiply;
+  font-size: 24px;
+  /* margin-left: 10%; */
+  text-align: center;
+}
+
+#logo {
+  width: 40%;
+  max-width: 200px;
+  height: auto;
+  /* transform: translate(-50%, -50%); */
+  /* top: 20%;
+    left: 50%; */
+  z-index: 0;
+  opacity: 0.9;
+}
+
+.cover-photo {
+  position: absolute;
+  width: 100vw;
+  object-fit: cover;
+  z-index: -1;
+  bottom: -25%;
+  left: 0;
+  opacity: 0;
+
+  transition: opacity 0.6s ease;
+
+  &.front {
+    opacity: 1;
+  }
+}

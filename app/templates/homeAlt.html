@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'include.html' %}
+    <link rel="stylesheet" href="{{url_for('static', filename='css/homeAlt.css')}}">
+</head>
+<body>
+    {% include 'banner.html' %}
+    
+    <main>
+        <section class="hero">
+            <img id="logo" src="{{url_for('static', filename='images/logo.png')}}" alt="Lizzie McGuire Logo">
+            <p>Capturing moments you'll want to keep forever.</p>
+            <img class="cover-photo" src="{{url_for('static', filename='images/cover-photo.JPG')}}" alt="cover photo">
+            <img class="cover-photo" src="{{url_for('static', filename='images/cover-photo-dep.JPG')}}" alt="cover photo">
+            <img class="cover-photo" src="{{url_for('static', filename='images/cover-photo-dep2.JPG')}}" alt="cover photo">
+        </section>
+        
+    </main>
+    {% include 'footer.html' %}
+</body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+    let coverPhotoImgs = document.querySelectorAll(".cover-photo");
+    let currentIndex = 0;
+    
+    // Initialize by adding "front" to the first image
+    coverPhotoImgs[currentIndex].classList.add("front");
+    
+    setInterval(() => {
+        // Remove "front" from the current image
+        coverPhotoImgs[currentIndex].classList.remove("front");
+        
+        // Move to the next image, looping back if necessary
+        currentIndex = (currentIndex + 1) % coverPhotoImgs.length;
+        
+        // Add "front" to the new image
+        coverPhotoImgs[currentIndex].classList.add("front");
+    }, 6000); // Change image every 3 seconds
+});
+</script>
+</html>
