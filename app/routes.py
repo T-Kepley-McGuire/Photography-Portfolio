@@ -135,7 +135,7 @@ HOLD_DURATION = timedelta(minutes=30)
 
 
 @main.route('/api/update_timeslot_status', methods=['PUT'])
-@cross_origin()
+# @cross_origin()
 def update_timeslot_status():
     # --- Parse the request data ---
     data = request.get_json()
@@ -268,7 +268,7 @@ def update_timeslot_status():
         return jsonify({"error": str(e)}), 500
 
 @main.route("/api/submit-booking", methods=["POST"])
-@cross_origin()
+# @cross_origin()
 def submit_booking():
     data = request.get_json()
 
@@ -369,7 +369,7 @@ def submit_booking():
 
         # Send to you (admin/staff)
         sendEmail(
-            recipientEmail="lizzymare00@gmail.com",
+            recipientEmail= os.getenv("PERSONAL_EMAIL_ADDRESS"),
             subject=f"Photography Booking with {data['name']}",
             body=(
                 f"{data['name']} has booked an appointment.\n"
@@ -386,6 +386,110 @@ def submit_booking():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+@main.route("/api/submit-external-booking", methods=["POST"])
+@cross_origin()
+def submit_external_booking():
+    data = request.get_json()
+
+    # 1. Required fields present and not empty
+    required_fields = ["fullName", "email", "phone", "selectedSessions"]
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return jsonify({"error": f"Missing or empty field: {field}"}), 400
+
+    # 2. Validate selectedSessions
+    selected_sessions = data["selectedSessions"]
+    if not isinstance(selected_sessions, list) or len(selected_sessions) == 0:
+        return jsonify({"error": "selectedSessions must be a non-empty list"}), 400
+
+    # Optional fields
+    location = data.get("location", "")
+    message = data.get("message", "")
+    referral_source = data.get("referralSource", "")
+
+    # ✅ All checks passed
+    print("Validated payload:")
+    print(data)
+
+    try:
+        # --- Prepare email sending ---
+        emailUser = os.getenv('EMAIL_ADDRESS')
+        emailPass = os.getenv('EMAIL_PASSWORD')
+        yag = yagmail.SMTP(user=emailUser, password=emailPass)
+
+        # Split name for template
+        name_parts = data["fullName"].split()
+        first_name = name_parts[0] if name_parts else ""
+        last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else ""
+
+        # --- Format session information ---
+        formatted_sessions = ", ".join(selected_sessions)
+
+        # Generate placeholder appointment options for the template
+        appointment_options = []
+
+        # --- Send confirmation emails ---
+        def send_email(recipient_email, subject, use_template=True, body=None):
+            try:
+                if use_template:
+                    # Use the HTML template for client email
+                    contents = render_template(
+                        'confirmation-v3.html',
+                        recipient_name=data["fullName"],
+                        session_type=formatted_sessions,
+                        appointment_options=appointment_options,
+                        company_name="Lizzie McGuire Photography",
+                        sender_name="Lizzie McGuire",
+                        contact_email=emailUser,
+                        contact_phone=os.getenv("PERSONAL_PHONE_NUMBER") | ""
+                    )
+                else:
+                    # Use plain text for admin notification
+                    contents = body
+
+                yag.send(
+                    to=recipient_email,
+                    subject=subject,
+                    contents=contents
+                )
+            except Exception as e:
+                print(f"Email sending error: {str(e)}")
+
+        # Send to user (HTML template)
+        send_email(
+            recipient_email=data["email"],
+            subject="Booking Confirmation",
+            use_template=True
+        )
+
+        # Send to admin (plain text)
+        admin_email = os.getenv("PERSONAL_EMAIL_ADDRESS")
+        admin_message = f"""
+New booking received:
+
+Full Name: {data['fullName']}
+Email: {data['email']}
+Phone: {data['phone']}
+Selected Sessions: {formatted_sessions}
+Location: {location}
+Referral Source: {referral_source}
+Message: 
+{message}
+        """
+        
+        send_email(
+            recipient_email=admin_email,
+            subject=f"New Booking Request from {data['fullName']}",
+            use_template=False,
+            body=admin_message
+        )
+
+        return jsonify({"message": "Booking submitted successfully"}), 200
+
+    except Exception as e:
+        # Log the error
+        print(f"Error processing booking: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 
