@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import session
 from flask_cors import CORS, cross_origin
 from flask.sessions import SecureCookieSessionInterface
@@ -17,21 +18,33 @@ pricing_data = [
         'id': 1,
         'name': "Minis",
         'description': "20 min session with minimum of 10 edited photos",
+        'shortDescription': "Minis: 20 min at $125",
         'holdPrice': 50,
         'price': 125
     }, {
         'id': 2,
         'name': "Standard",
         'description': "40 min session with minimum of 20 edited photos",
+        'shortDescription': "Standard: 40 min at $225",
         'holdPrice': 50,
         'price': 225
     }, {
         'id': 3,
         'name': "Extended",
         'description': "1 hour session with minimum of 30 edited photos",
+        'shortDescription': "Extended: 60 min at $330",
         'holdPrice': 50,
         'price': 330
     }
+]
+
+sessionTypes = [
+    "Family",
+    "Senior Portrait",
+    "Couple/Engagement",
+    "Maternity",
+    "Event",
+    "Other",
 ]
 
 
@@ -102,6 +115,7 @@ def images():
     # Return the list of image URLs as a JSON array
     return jsonify(image_list)
 
+
 @main.route('/homeAlt')
 def homeAlt():
     return render_template('homeAlt.html')
@@ -110,10 +124,18 @@ def homeAlt():
 # def about():
 #     return render_template('about.html')
 
+
 @main.route('/ping')
 @cross_origin()
 def ping():
     return jsonify("pong")
+
+
+@main.route('/api/session-types')
+@cross_origin()
+def get_session_types():
+    return jsonify(sessionTypes)
+
 
 @main.route('/api/pricing')
 @cross_origin()
@@ -230,6 +252,7 @@ def update_timeslot_status():
         dateString = dates[0] if len(dates) == 1 else f'{dates[0]} or {dates[1]}' if len(
             dates) == 2 else f'{dates[0]}, {dates[1]}, or {dates[2]}'
         pricingOptionString = f'Pricing Option: {pricing["name"]}\n{pricing["description"]}\nHolding Price: {pricing["holdPrice"]}\nPrice: {pricing["price"]}'
+
         def sendEmail(recipientEmail, subject, body=None, attachments=None):
             try:
                 # Send the email with first and last name now in the template
@@ -248,7 +271,7 @@ def update_timeslot_status():
                     attachments=attachments
                 )
             except Exception as e:
-                pass # print(f"Failed to send email: {e}")
+                pass  # print(f"Failed to send email: {e}")
 
         # Send the confirmation email
         sendEmail(
@@ -267,6 +290,7 @@ def update_timeslot_status():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @main.route("/api/submit-booking", methods=["POST"])
 # @cross_origin()
 def submit_booking():
@@ -279,7 +303,8 @@ def submit_booking():
             return jsonify({"error": f"Missing or empty field: {field}"}), 400
 
     # 2. Validate packageId
-    matching_package = next((p for p in pricing_data if p['id'] == data["packageId"]), None)
+    matching_package = next(
+        (p for p in pricing_data if p['id'] == data["packageId"]), None)
     if not matching_package:
         return jsonify({"error": "Invalid packageId"}), 400
 
@@ -309,7 +334,8 @@ def submit_booking():
             return jsonify({"error": f"Invalid month format: {date['month']}"}), 400
 
         try:
-            slot_date = datetime(int(date["year"]), month_num, int(date["day"]))
+            slot_date = datetime(
+                int(date["year"]), month_num, int(date["day"]))
         except ValueError:
             return jsonify({"error": f"Invalid calendar date: {date}"}), 400
 
@@ -324,16 +350,17 @@ def submit_booking():
 
     # return jsonify({"status": "success", "message": "Booking validated", "selectedPackage": matching_package}), 200
     try:
-    # --- Commit booking to database here, if needed ---
-    # db.session.commit()
+        # --- Commit booking to database here, if needed ---
+        # db.session.commit()
 
-    # --- Prepare email sending ---
+        # --- Prepare email sending ---
         emailUser = os.getenv('EMAIL_ADDRESS')
         emailPass = os.getenv('EMAIL_PASSWORD')
         yag = yagmail.SMTP(user=emailUser, password=emailPass)
 
         # --- Format timeslot and pricing information ---
-        formattedTimeslots = formatTimeslots(data["timeslots"])  # <- helper function
+        formattedTimeslots = formatTimeslots(
+            data["timeslots"])  # <- helper function
         pricingOption = matching_package  # already found in earlier validation
         pricingString = (
             f"Pricing Option: {pricingOption['name']}\n"
@@ -351,8 +378,10 @@ def submit_booking():
                     contents=body if body is not None else
                     render_template(
                         'confirmation-new.html',
-                        first_name=data["name"].split()[0],  # crude first name extraction
-                        last_name=' '.join(data["name"].split()[1:]) or '',  # crude last name fallback
+                        # crude first name extraction
+                        first_name=data["name"].split()[0],
+                        # crude last name fallback
+                        last_name=' '.join(data["name"].split()[1:]) or '',
                         timeslot=formattedTimeslots,
                         current_year=datetime.now().strftime("%Y")
                     ),
@@ -369,7 +398,7 @@ def submit_booking():
 
         # Send to you (admin/staff)
         sendEmail(
-            recipientEmail= os.getenv("PERSONAL_EMAIL_ADDRESS"),
+            recipientEmail=os.getenv("PERSONAL_EMAIL_ADDRESS"),
             subject=f"Photography Booking with {data['name']}",
             body=(
                 f"{data['name']} has booked an appointment.\n"
@@ -386,13 +415,15 @@ def submit_booking():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
 @main.route("/api/submit-external-booking", methods=["POST"])
 @cross_origin()
 def submit_external_booking():
     data = request.get_json()
 
     # 1. Required fields present and not empty
-    required_fields = ["fullName", "email", "phone", "selectedSessions"]
+    required_fields = ["fullName", "email", "phone",
+                       "selectedSessions", "selectedPricing"]
     for field in required_fields:
         if field not in data or not data[field]:
             return jsonify({"error": f"Missing or empty field: {field}"}), 400
@@ -401,6 +432,10 @@ def submit_external_booking():
     selected_sessions = data["selectedSessions"]
     if not isinstance(selected_sessions, list) or len(selected_sessions) == 0:
         return jsonify({"error": "selectedSessions must be a non-empty list"}), 400
+
+    selected_pricing = data["selectedPricing"]
+    if not isinstance(selected_pricing, int):
+        return jsonify({"error": "must select pricing option"}), 400
 
     # Optional fields
     location = data.get("location", "")
@@ -424,7 +459,15 @@ def submit_external_booking():
 
         # --- Format session information ---
         formatted_sessions = ", ".join(selected_sessions)
+        formatted_pricing = ""
 
+        def get_by_id(data, target_id): return next(
+            (item for item in data if item['id'] == target_id), None)
+        if selected_pricing == -1:
+            formatted_pricing = "Other: negotiable"
+        else:
+            found_pricing = get_by_id(pricing_data, selected_pricing)
+            formatted_pricing = found_pricing["shortDescription"] if found_pricing is not None else ""
         # Generate placeholder appointment options for the template
         appointment_options = []
 
@@ -441,7 +484,7 @@ def submit_external_booking():
                         company_name="Lizzie McGuire Photography",
                         sender_name="Lizzie McGuire",
                         contact_email=emailUser,
-                        contact_phone=os.getenv("PERSONAL_PHONE_NUMBER") | ""
+                        contact_phone=os.getenv("PERSONAL_PHONE_NUMBER") or ""
                     )
                 else:
                     # Use plain text for admin notification
@@ -471,12 +514,13 @@ Full Name: {data['fullName']}
 Email: {data['email']}
 Phone: {data['phone']}
 Selected Sessions: {formatted_sessions}
+Package Option: {formatted_pricing}
 Location: {location}
 Referral Source: {referral_source}
 Message: 
 {message}
         """
-        
+
         send_email(
             recipient_email=admin_email,
             subject=f"New Booking Request from {data['fullName']}",
@@ -490,7 +534,6 @@ Message:
         # Log the error
         print(f"Error processing booking: {str(e)}")
         return jsonify({"error": str(e)}), 500
-
 
 
 @main.route('/api/held_timeslot')
@@ -548,8 +591,6 @@ def get_available_dates():
     return jsonify(date_timeslot_list)
 
 
-from datetime import datetime
-
 def formatTimeslots(timeslots: list) -> str:
     """
     Convert a list of timeslot dictionaries into a human-readable string.
@@ -567,22 +608,25 @@ def formatTimeslots(timeslots: list) -> str:
 
         # Convert JS-style short month name to full month name with datetime
         try:
-            parsed_date = datetime.strptime(f"{month_str} {day} {year}", "%b %d %Y")
+            parsed_date = datetime.strptime(
+                f"{month_str} {day} {year}", "%b %d %Y")
             formatted_date = parsed_date.strftime("%B %d, %Y")
         except ValueError:
-            formatted_date = f"{month_str} {day}, {year}"  # fallback in case of error
+            # fallback in case of error
+            formatted_date = f"{month_str} {day}, {year}"
 
         slots = []
-        if ts.get("morning"): slots.append("Morning")
-        if ts.get("afternoon"): slots.append("Afternoon")
-        if ts.get("evening"): slots.append("Evening")
+        if ts.get("morning"):
+            slots.append("Morning")
+        if ts.get("afternoon"):
+            slots.append("Afternoon")
+        if ts.get("evening"):
+            slots.append("Evening")
 
         if slots:
             formatted.append(f"{formatted_date} ({', '.join(slots)})")
 
     return formatted
-
-
 
 
 def parse_month(month_str):
