@@ -19,7 +19,7 @@
                     <tr>
                         <td style="padding-bottom: 20px;">
                             <p style="margin: 0; font-size: 16px;">Hi <strong>{{ recipient_name }}</strong>,</p>
-                            <p style="margin: 0; font-size: 16px;">Thank you for booking with us! Please review the tentative appointment options below.</p>
+                            <p style="margin: 0; font-size: 16px;">Thank you for booking with us! We will contact you within the next 24 hours to confirm a time and discuss any additional details. If you need to reschedule or have any immediate questions, don't hesitate to reply to this email.</p>
                         </td>
                     </tr>
                     <tr>
@@ -28,6 +28,10 @@
                                 <tr>
                                     <td width="140" style="font-weight: bold; padding-bottom: 10px;">Session Type:</td>
                                     <td style="padding-bottom: 10px;">{{ session_type }}</td>
+                                </tr>
+                                <tr>
+                                    <td width="140" style="font-weight: bold; padding-bottom: 10px;">Package Option:</td>
+                                    <td style="padding-bottom: 10px;">{{ package_name }}: {{ package_description }}; {{ package_price }} </td>
                                 </tr>
                                 {% if appointment_options|length > 0 %}
                                 <tr>
@@ -45,12 +49,7 @@
                             </table>
                         </td>
                     </tr>
-                    <tr>
-                        <td style="padding-top: 20px;">
-                            <p style="margin: 0; font-size: 16px;">We will contact you within the next 24 hours to confirm a time and discuss any additional details.</p>
-                            <p style="margin-top: 20px; font-size: 16px;">If you need to reschedule or have any immediate questions, don't hesitate to reply to this email.</p>
-                        </td>
-                    </tr>
+
                 </table>
             </td>
         </tr>
